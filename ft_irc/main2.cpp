@@ -1,18 +1,62 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: oel-houm <oel-houm@student.1337.ma>        +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/17 11:22:36 by oel-houm          #+#    #+#             */
-/*   Updated: 2024/01/17 11:22:39 by oel-houm         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include <iostream>	
+#include <string.h>	
+#include <unistd.h>	
+#include <stdlib.h>	
+#include <sys/types.h>	// For various data types used in system calls
+#include <sys/socket.h>	// For socket-related functions
+#include <netinet/in.h>	// For Internet address structures
+#include <arpa/inet.h>	// For functions to manipulate IP addresses
+#include <netdb.h>	// For functions to query DNS (e.g., gethostbyname)
+#include <fcntl.h>	// For file control (e.g., fcntl)
+#include <errno.h>	// For error handling (errno variable)
+#include <sys/poll.h>
+#include <vector>
+#include <map>
+#include <sstream>
+#include <fstream>
+#include <cstring>
 
-#include "Include/Server.hpp"
-#include "Include/Client.hpp"
-#include "Include/Channel.hpp"
+#define SIZE 512
+
+class   Client {
+    private:
+        int     _socket_fd;
+        struct pollfd fd;
+        std::string IPAddr;
+        struct socketaddr_in _addr;
+        std::string _username;
+        std::string _nickname;
+        std::string  _buffer;
+        bool _authenticate;
+        bool _welcomed;
+        bool _registred;
+    public:
+        Client();
+};
+
+class   Channel {
+    private:
+        std::string _name;
+    public:
+        Channel();
+};
+
+class Server {
+    private:
+        std::string             _hostname;
+        int                     _serverSocket;
+        std::string             _password;
+        int                     _port;
+        struct soketaddr_in     _addr;
+        struct pollfd           _fds[SIZE]; // designed to handle multiple fds simultaneously, likely for managing communication with multiple clients or channels concurrently.
+        std::vector<Client *>   clientList;
+        std::vector<Channel *>  _channels;
+    public:
+        Server(std::string port, std::string password);
+        void    start();
+        void    handle_new_connection();
+        // Server();
+};
 
 Server::Server(std::string port, std::string password) {
     this->_port = atoi(port.c_str());
@@ -20,7 +64,10 @@ Server::Server(std::string port, std::string password) {
         throw std::runtime_error("Invalid port");
     this->_password = password;
     if (!(this->_password.length() >= 8 && this->_password.length() <= 16))
+    {
+        // password-policy length from 8 to 16
         throw std::runtime_error("Invalid password");
+    }
 }
 
 void    Server::start() {
@@ -56,7 +103,7 @@ void    Server::start() {
     }
     struct pollfd _pollfd;
     _pollfd.fd = this->_serverSocket; // The file descriptor to monitor for events.
-    _pollfd.events = POLLIN; // POLLIN monitoring for incoming data.
+    _pollfd.events = POLLIN; // In this case, POLLIN indicates that you're interested in monitoring for incoming data.
     _pollfd.revents = 0; // Initialize revents to 0. This field will be updated by poll() to indicate which events occurred.
     this->_fds[0] = _pollfd;
     /*
@@ -80,14 +127,15 @@ void    Server::start() {
     /* listening */
     if (listen(this->_serverSocket, 0) < 0)
     {
-        throw std::runtime_error("Failed to listen for connections");
-        // throw std::runtime_error("Error on listen: " + std::string(strerror(errno)));
+        // throw std::runtime_error("Failed to listen for connections");
+        throw std::runtime_error("Error on listen: " + std::string(strerror(errno)));
     }
     // std::cout << "Listening ..." << std::endl;
-    // set the status flags of the server's socket to non-blocking mode
-    if (fcntl(this->_serverSocket, F_SETFL, O_NONBLOCK) == -1) {
-        std::runtime_error("Error setting socket to non-blocking mode");
-    }
+    // set the status flags of the server's socket to non-blocking
+    /*if (fcntl(server_fd, F_SETFL, O_NONBLOCK) == -1) {
+        logger.error("Error setting socket to nonblocking mode!");
+        exit(1);
+    }*/
 
     /* ---------- ------------ ----------------- ------------------- */
     // making the first elem of poll structs array (which contain the server socket's FD)
@@ -190,3 +238,4 @@ int     main(int ac, char **av)
         std::cout << e.what() << std::endl;
     }
 }
+
