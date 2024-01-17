@@ -6,7 +6,7 @@
 /*   By: oel-houm <oel-houm@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/12 13:00:04 by oel-houm          #+#    #+#             */
-/*   Updated: 2024/01/13 03:02:32 by oel-houm         ###   ########.fr       */
+/*   Updated: 2024/01/15 09:44:38 by oel-houm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,37 @@
 #include <fcntl.h>	// For file control (e.g., fcntl)
 #include <errno.h>	// For error handling (errno variable)
 
+class Server {
+	private:
+		std::string		_hostname;
+		int			_socketfd;
+		int			_port;
+		struct sockaddr_in	_addr;
+		_fds[];
+		std::string		_password;
+		_list;
+		_channels;
+	public:
+		Server(std::string port, std::string password);
+		~Server();
+}
+
+Server::Server(std::string port, std::string password) {
+	//
+}
+
 using namespace std;
 
 int	main(int ac, char **av)
 {
-	(void)ac;
-	(void)av;
-	return (0);
+	if (ac != 3) {
+		cout << "Invalid number of arguments!" << endl;
+		// usage:
+		return 1;
+	}
+	try {
+		Server server(av[1], av[2]);
+		(void)av;
+	} catch (const runtime_error& e) {cout << e.what() << endl;}
+	return 0;
 }
