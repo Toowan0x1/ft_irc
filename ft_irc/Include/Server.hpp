@@ -37,13 +37,15 @@ class Server {
         int                     _serverSocket;
         std::string             _password;
         int                     _port;
-        struct soketaddr_in     _addr;
+        struct sockaddr_in      _addr;
         struct pollfd           _fds[SIZE]; // Managing communication with multiple clients or channels concurrently.
         std::vector<Client *>   clientList;
         std::vector<Channel *>  _channels; // channelList;
     public:
         Server(std::string port, std::string password);
         void    start();
+        void    setServerSocket();
+        void    setServerAddrInfo();
         void    handle_new_connection();
         // Server();
 };

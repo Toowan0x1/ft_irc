@@ -17,7 +17,7 @@ class   Client {
         // std::string command
         int     _socket_fd; // clientfd clientsocket
         struct pollfd fd;
-        struct socketaddr_in _addr;
+        struct sockaddr_in _addr;
         std::string _username;
         std::string _nickname;
         std::string _realName;

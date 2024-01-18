@@ -23,17 +23,7 @@ Server::Server(std::string port, std::string password) {
         throw std::runtime_error("Invalid password");
 }
 
-void    Server::start() {
-    /*
-    1. Create Socket
-    Create Epoll
-    2. Set addr info
-    3. Bind Socket
-    4. Listen Socket
-    5. Add Socket to epoll
-    6. Read Socket
-    */
-   /* 1. set socket */
+void    Server::setServerSocket() {
     int optValue = 1;
     this->_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (this->_serverSocket < 0) // == -1
@@ -43,7 +33,9 @@ void    Server::start() {
         throw std::runtime_error("Failed to set SO_REUSEADDR option");
     if (fcntl(this->_serverSocket, F_SETFL, O_NONBLOCK) < 0)
         throw std::runtime_error("Failed to set socket to non-blocking mode");
-    /* 1. set addr info */
+}
+
+void    Server::setServerAddrInfo() {
     memset(&this->_addr, 0, sizeof(this->_addr));
     this->_addr.sin_family = AF_INET;
     this->_addr.sin_addr.s_addr = INADDR_ANY;
@@ -70,6 +62,17 @@ void    Server::start() {
       After the poll system call returns, this field is filled
       by the kernel to indicate which events occurred.
     */
+}
+
+void    Server::start() {
+    /*
+    1. Create Socket
+    Create Epoll
+    2. Set addr info
+    3. Bind Socket
+    4. Listen Socket
+    5. Add Socket to epoll
+    6. Read Socket */
 
     /* binding the server */
     if (bind(this->_serverSocket, (struct sockaddr*)&this->_addr, sizeof(this->_addr)) < 0)
@@ -158,8 +161,8 @@ void    Server::start() {
 */
 void    Server::handle_new_connection() // accept a connection
 {
-    struct socketaddr_in client;
-    socketlen_t clientSize = sizeof(client);
+    struct sockaddr_in client;
+    socklen_t clientSize = sizeof(client);
     // creating an FD socket for he new connection
     int clientSocket = accept(this->_serverSocket, (sockaddr*)&client, &clientSize);
     if (clientSocket < 0)
@@ -175,8 +178,7 @@ void    Server::handle_new_connection() // accept a connection
     // push_back the created pd to the array of pds
     // this->_pds.push_back(pd) // client_fds!
 }
-
-int     main(int ac, char **av)
+ int     main(int ac, char **av)
 {
     if (ac != 3) {
         std::cerr << "Invalid number of arguments." << std::endl;
