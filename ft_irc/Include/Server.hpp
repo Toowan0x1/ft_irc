@@ -10,6 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef SERVER_HPP
+#define SERVER_HPP
+
 #include <iostream>	
 #include <string.h>	
 #include <unistd.h>	
@@ -29,23 +32,28 @@
 #include <cstring>
 
 #define SIZE 512
-#define PASSWORD "password123456"
+#define PASSWORD "IRC-1337"
+
+class Client;
 
 class Server {
     private:
         std::string             _hostname;
-        int                     _serverSocket;
+        int                     _serverSocketFd;
         std::string             _password;
         int                     _port;
         struct sockaddr_in      _addr;
-        struct pollfd           _fds[SIZE]; // Managing communication with multiple clients or channels concurrently.
-        std::vector<Client *>   clientList;
+        // struct pollfd        _clients_pfds[SIZE]; // Managing communication with multiple clients or channels concurrently.
+        std::vector<pollfd>     _pfds; // Managing communication with multiple clients or channels concurrently.
+        std::vector<Client *>   _clientList;
         std::vector<Channel *>  _channels; // channelList;
     public:
         Server(std::string port, std::string password);
         void    start();
         void    setServerSocket();
         void    setServerAddrInfo();
-        void    handle_new_connection();
-        // Server();
+        void    acceptConnection();
+        ~Server();
 };
+
+#endif

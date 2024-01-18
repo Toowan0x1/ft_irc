@@ -10,6 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef CHANNEL_HPP
+#define CHANNEL_HPP
+
 #include "Server.hpp"
 
 class   Channel {
@@ -18,3 +21,5 @@ class   Channel {
     public:
         Channel();
 };
+
+#endif
