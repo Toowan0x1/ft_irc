@@ -37,10 +37,10 @@ void    Server::acceptConnection() {
 void    Server::setServerSocket() {
     int optValue = 1;
     this->_serverSocketFd = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->_serverSocketFd < 0) // == -1
-        throw std::runtime_error("Failed to create socket");
+    if (this->_serverSocketFd < 0)
+        throw std::runtime_error("Failed to create server socket");
     if (setsockopt(this->_serverSocketFd, SOL_SOCKET, SO_REUSEADDR, &optValue, sizeof(optValue)) < 0)
-        throw std::runtime_error("Failed to set SO_REUSEADDR option");
+        throw std::runtime_error("Failed to set SO_REUSEADDR option"); 
     if (fcntl(this->_serverSocketFd, F_SETFL, O_NONBLOCK) < 0)
         throw std::runtime_error("Failed to set socket to non-blocking mode");
 }
@@ -56,28 +56,44 @@ void    Server::setServerAddrInfo() {
     } else {
         throw std::runtime_error("Error getting hostname");
     }
-    // pollfd server_pfd = {this->_serverSocketFd, POLLIN, 0};
-    // this->_pfds.push_back(server_pfd); // this->_pfds[0] = server_pfd;
+    struct pollfd serverPfd;
+    serverPfd.fd = this->_serverSocketFd;
+    serverPfd.events = POLLIN;
+    serverPfd.revents = 0;
+    this->_pfds.push_back(serverPfd); // this->_pfds[0] = serverPfd;
 }
 
-void    Server::start() {
+// associating an IP address and port number with a socket
+void    Server::bindServerSocket() {
     if (bind(this->_serverSocketFd, (struct sockaddr*)&this->_addr, sizeof(this->_addr)) < 0) {
-        throw std::runtime_error("Failed to bind socket"); // ("Failed to bind to " + std::to_string(this->port));
+        throw std::runtime_error("Failed to bind server socket to port " + std::to_string(this->_port));
     }
-    // std::cout << "Server Socket has been created and binded successfully" << std::endl;
-    if (listen(this->_serverSocketFd, 0) < 0) {
+    std::cout << "Server Socket has been created and binded successfully" << std::endl;
+}
+
+// addClient Function
+// getnameinfo()
+// main loop
+
+// acceptConnection || handleNewConnection
+// acceptMessage
+// handleDisconnection
+
+void    Server::start() {
+    this->setServerSocket();
+    this->setServerAddrInfo();
+    this->bindServerSocket();
+
+    if (listen(this->_serverSocketFd, SOMAXCONN) < 0) {
         throw std::runtime_error("Failed to listen for connections");
-    }
         // throw std::runtime_error("Error on listen: " + std::string(strerror(errno)));
-    // std::cout << "Listening ..." << std::endl;
-    // set the status flags of the server's socket to non-blocking mode
+    }
+    std::cout << "Listening ..." << std::endl;
+    
     if (fcntl(this->_serverSocketFd, F_SETFL, O_NONBLOCK) == -1) {
         std::runtime_error("Error setting socket to non-blocking mode");
     }
-    pollfd server_pfd = {this->_serverSocketFd, POLLIN, 0};
-    this->_pfds.push_back(server_pfd); // this->_pfds[0] = server_pfd;
 
-    /* -------------------- -------------------- -------------------- -------------------- */
     while (1) {
         if (poll(this->_pfds.data(), _pfds.size(), -1) < 0) {
             throw std::runtime_error("poll failed !");
@@ -113,14 +129,20 @@ void    Server::start() {
     }
 }
 
+Server::Server(std::string port, std::string password) {
+    this->_port = atoi(port.c_str());
+    if (this->_port == 0 || (this->_port < 0 && this->_port > 65535))
+        throw std::runtime_error("Invalid port");
+    this->_password = password;
+    if (!(this->_password.length() >= 8 && this->_password.length() <= 16)) // != Password || empty
+        throw std::runtime_error("Invalid password");
+}
+
 Server::~Server() {
-    // delete all reserved clients + close clients socket fds
     for (int i = 0; i < this->_clientList.size(); i++) {
         delete _clientList[i];
-        close(this->_pfds[i + 1].fd); // i+1 because the i=0 reserved for the server;
+        close(this->_pfds[i + 1].fd);
     }
-    // delete server socket
-    /*
-        ...
-    */
+    if (this->_pfds[0].fd)//this->_pfds.size())
+        close(this->_pfds[0].fd);
 }

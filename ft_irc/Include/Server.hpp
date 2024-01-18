@@ -52,8 +52,13 @@ class Server {
         void    start();
         void    setServerSocket();
         void    setServerAddrInfo();
+        void    bindServerSocket();
         void    acceptConnection();
         ~Server();
 };
+// clientPfds
+// serverPfd
+// fcntl
+// gns3
 
 #endif

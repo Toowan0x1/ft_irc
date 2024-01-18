@@ -14,15 +14,6 @@
 #include "./Include/Client.hpp"
 #include "./Include/Channel.hpp"
 
-Server::Server(std::string port, std::string password) {
-    this->_port = atoi(port.c_str());
-    if (this->_port == 0 || (this->_port < 0 && this->_port > 65535))
-        throw std::runtime_error("Invalid port");
-    this->_password = password;
-    if (!(this->_password.length() >= 8 && this->_password.length() <= 16))
-        throw std::runtime_error("Invalid password");
-}
-
  int     main(int ac, char **av)
 {
     if (ac != 3) {
