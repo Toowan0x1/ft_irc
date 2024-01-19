@@ -12,8 +12,14 @@ Internet Relay Chat is implemented as an application layer protocol to facilitat
 - Connect from client. From CIRC: ```/server <SERVER_IP> <SERVER_PORT> <SERVER_PASSWORD>```
 
 ## Supported Commands
-- KICK
-- JOIN
-- WHO
-- WHOIS
-- ...
+- /JOIN #channel_name
+- /NICKNAME
+- /MSG
+- /PRIVMSG
+- /LIST
+- /WHO
+- /WHOIS
+- /KICK
+- /INVITE
+- /TOPIC
+- /MODE

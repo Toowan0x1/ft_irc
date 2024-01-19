@@ -71,13 +71,26 @@ void    Server::bindServerSocket() {
     std::cout << "Server Socket has been created and binded successfully" << std::endl;
 }
 
-// addClient Function
 // getnameinfo()
-// main loop
+// server loop [3]
 
-// acceptConnection || handleNewConnection
-// acceptMessage
-// handleDisconnection
+/*
+std::string Server::addClient(struct pollfd _poll, std::string line)
+{
+    std::stringstream toowan(line);
+    std::string pass;
+    toowan >> pass;
+    if (pass != "PASS")
+        return "464 :Password incorrect\r\n";
+    toowan >> pass;
+    if (!pass.empty() && pass[0] == ':')
+        pass = pass.substr(1);
+    if (pass != this->_password)
+        return "464 :Password incorrect\r\n";
+    this->list[_poll.fd].setRegistered(true);
+    return "";
+}
+*/
 
 void    Server::start() {
     this->setServerSocket();
@@ -95,28 +108,41 @@ void    Server::start() {
     }
 
     while (1) {
-        if (poll(this->_pfds.data(), _pfds.size(), -1) < 0) {
-            throw std::runtime_error("poll failed !");
+        if (poll(this->_pfds.data(), this->_pfds.size(), -1) < 0) {
+            throw std::runtime_error("poll ** failed");
         }
         for (int i = 0; i < this->_pfds.size(); i++)
         {
             if (this->_pfds[i].revents == 0)
                 continue ;
             if (this->_pfds[i].revents == POLLIN && this->_pfds[i].fd == this->_serverSocketFd)
-            // equivalent to "if (this->_fds[i].revents & POLLIN)"
             {
-                acceptConnection();
-                // else HANDLE INCOMING MSG accept_message();
+                // There is an incoming connection request on the server socket
+                // Accept the connection using accept() function
+                // acceptNewConnection handlenewconnection()
+                // Handle incoming connection on the server socket
+                // Accept the connection, create a new client object, etc. and add it to your list of connected clients
+                acceptConnection(); // handle error in accept(serversocketfd, nullptr, nullptr) if == -1 < 0
             }
             if (this->_pfds[i].revents == POLLIN && this->_pfds[i].fd != this->_serverSocketFd)
-            // equivalent to "if (this->_fds[0].fd != 0 &&  this->_fds[0].revents == POLLIN)"
             {
-                // acceptMessage();
+                /*
+                // Handle incoming data on a client socket
+                // Read data from the client socket and process it
+                // Example: char buffer[1024];
+                // ssize_t bytesRead = recv(this->p_fd[i].fd, buffer, sizeof(buffer), 0);
+                // Handle the received data accordingly
+                */
+                // HANDLE INCOMING MSG
+                // acceptMessage(); read data on client socket, read client msg
             }
-            if (this->_pfds[i].revents == 17 || this->_pfds[i].revents == POLLHUP)
-            {
-                // if (this->_fds[i].revents & (POLLHUP | POLLERR)) {
-                // handle_disconnection();
+            if (this->_pfds[i].revents == 17 || this->_pfds[i].revents == POLLHUP) {// if (this->_fds[i].revents & (POLLHUP | POLLERR)) {
+                // handleDisconnect();
+                /*
+                // Handle events indicating that the connection was closed or an error occurred
+                // Example: close(this->p_fd[i].fd);
+                // Remove the corresponding client from your list of connected clients
+                */
             }
         }
         // disconnect the client if the _keepAlive boolean is false 
@@ -143,6 +169,7 @@ Server::~Server() {
         delete _clientList[i];
         close(this->_pfds[i + 1].fd);
     }
+    // close(this->serverSocketFd);
     if (this->_pfds[0].fd)//this->_pfds.size())
         close(this->_pfds[0].fd);
 }
