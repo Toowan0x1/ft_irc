@@ -14,6 +14,8 @@
 #define CHANNEL_HPP
 
 #include "Server.hpp"
+#include "Client.hpp"
+#include "Channel.hpp"
 
 class   Channel {
     private:

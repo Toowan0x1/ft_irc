@@ -42,21 +42,23 @@ class   Client {
 class   Client {
     public:
         // std::string command
-        int     _socket_fd; // clientfd clientsocket
-        struct pollfd fd;
-        struct sockaddr_in _addr;
+        // int clientId;
+        int                 _clientFd; // clientSocketFd
+        struct pollfd       _fd;
+        struct sockaddr_in  _addr;
         std::string _username;
         std::string _nickname;
         std::string _realName;
         std::string _IPAddress;
         std::string _password;
         std::string  _buffer; // _msgBuffer  + leave_msg
-        bool _authenticate; //authorized // authorized means client entered correct password (only)
+        bool _authenticated; //authorized // authorized means client entered correct password (only)
         bool _welcomed; // welcomed means this used was registered before and welcomed, used so that we dont send welcome messages everytime user changes nick
         bool _registred; // registered means client entered correct password, a valid nickname, username and realname 
         bool _keepAlive;
-        
+
         Client(int &clientFD); // clientSocketFd
+        ~Client();
 };
 
 

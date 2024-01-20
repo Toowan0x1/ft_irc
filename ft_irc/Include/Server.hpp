@@ -46,7 +46,7 @@ class Server {
         // struct pollfd        _clients_pfds[SIZE]; // Managing communication with multiple clients or channels concurrently.
         std::vector<pollfd>     _pfds; // Managing communication with multiple clients or channels concurrently.
         std::vector<Client *>   _clientList;
-        std::vector<Channel *>  _channels; // channelList;
+        //std::vector<Channel *>  _channels; // channelList;
     public:
         Server(std::string port, std::string password);
         void    start();

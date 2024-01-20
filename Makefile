@@ -12,9 +12,15 @@
 
 CC := g++
 CXXFLAGS := -Wall -Wextra -Werror -std=c++98
-INCLUDES := -I./
+INCLUDES := -I./ -I./ft_irc/include
 
-SRC := main.cpp
+# List all your source files in the SRC variable
+SRC :=	ft_irc/main.cpp		\
+		ft_irc/Src/Server.cpp	\
+		ft_irc/Src/Client.cpp	\
+		ft_irc/Src/Channel.cpp
+
+# Generate the list of object files based on source files
 OBJ := $(SRC:.cpp=.o)
 
 NAME := ircserv
@@ -24,6 +30,7 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	@$(CC) $(CXXFLAGS) $(INCLUDES) -o $(NAME) $(OBJ)
 
+# Compile each source file into an object file
 %.o: %.cpp
 	@$(CC) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -36,4 +43,3 @@ fclean: clean
 re: fclean all
 
 .PHONY: all clean fclean re
-
