@@ -96,11 +96,22 @@ std::string Server::addClient(struct pollfd _poll, std::string line)
 }
 */
 
+std::vector<std::string> split(const std::string &s, char delimiter) {
+    std::vector<std::string> tokens;
+    std::istringstream ss(s);
+    std::string token;
+
+    while (std::getline(ss, token, delimiter)) {
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+
 void    Server::start() {
     std::cout << "Irc server Launched" << std::endl;
     this->setServerSocket();
     this->setServerAddrInfo();
-    // std::cout << "Server Address Info Configured successfuly" << std::endl;
     this->bindServerSocket();
 
     if (listen(this->_serverSocketFd, SOMAXCONN) < 0) {
@@ -126,32 +137,161 @@ void    Server::start() {
             if (this->_pfds[i].revents == POLLIN && this->_pfds[i].fd != this->_serverSocketFd) {
                 // acceptMessage();
                 char buffer[1024];
-                int bytesRead = recv(this->_pfds[i].fd, buffer, sizeof(buffer), 0);
+                std::memset(buffer, 0, sizeof(buffer));
+                int receivedBytes = recv(this->_pfds[i].fd, buffer, sizeof(buffer), 0);
                 /* Set msgSize */
-                if (bytesRead < 0)
+                if (receivedBytes < 0)
                     std::runtime_error("recv error");
-                if (bytesRead == 0)
+                //if (receivedBytes == 0)
                     //
-                if (bytesRead > 0) {
-                    buffer[bytesRead] = '\0'; // Null-terminate the received data
+                if (receivedBytes > 0) {
+                    buffer[receivedBytes] = '\0'; // Null-terminate the received data
+                    //std::cout << "received bytes: \n" << buffer << std::endl;
+                    std::string cap, pass, nick, user;
+                    std::vector<std::string> lines;
+                    std::string line;
                     // split the received message into parts (commands and parameters)
                     std::vector<std::string> parts;
                     std::istringstream iss(buffer);
-                    do {
-                        std::string part;
-                        iss >> part;
-                        parts.push_back(part);
-                    } while (iss);
-                    // handle NICK cmd:
-                    if (parts.size() >= 2 && parts[0] == "NICK") {
-                        std::cout << "User " << parts[1] << " has set a nickname" << std::endl;
+                    int j = 0;
+                    while (std::getline(iss, line, '\n')) {
+                        lines.push_back(line);
+                        j++;
                     }
-                    else if (parts.size() >= 2 && parts[0] == "PASS") {
-                        std::cout << "User has been set a password" << std::endl;
+                    // std::cout << "total lines (" << j << ")" << std::endl;
+                    int i = 0;
+                    int flag = 0;
+                    while (i < j) {
+                        // std::cout << "line " << i << ": " << lines[i] << std::endl;
+                        std::vector<std::string> tokens;
+                        std::string token;
+                        std::istringstream parts(lines[i]);
+                        std::string tmp;
+                        while (std::getline(parts, token, ' '))
+                        {
+                            //
+                            tokens.push_back(token);
+                            // token.push_back('\0');
+                            //std::cout << "token(" << i << "): " << token << std::endl;
+                            // (token == "LIST" || tokens[0] == "LIST" || tokens[0] == "list")
+                            if (!(tokens[0].find("LIST")))
+                            {
+                                std::cout << "token(LIST): " << token << std::endl;
+                            }
+                            else if (tokens[0] == "CAP")
+                            {
+                                std::cout << "token(CAP): " << token << std::endl;
+                            }
+                            else if (tokens[0] == "USER")
+                            {
+                                //std::cout << "token(USER): " << token << std::endl;
+                                //if (!(tmp.empty())){
+                                    tmp += " ";
+                                    tmp += token;
+                                //}
+                            }
+                            else if (tokens[0] == "PASS")
+                            {
+                                std::cout << "token(PASS): " << token << std::endl;
+                            }
+                            else if (tokens[0] == "NICK")
+                            {
+                                std::cout << "token(NICK): " << token << std::endl;
+                            }
+                            else if (tokens[0] == "JOIN")
+                            {
+                                std::cout << "token(JOIN): " << token << std::endl;
+                            }
+                            else if (tokens[0] == "MSG")
+                            {
+                                std::cout << "token(MSG): " << token << std::endl;
+                            }
+                            else if (tokens[0] == "PRIVMSG")
+                            {
+                                std::cout << "token(PRIVMSG): " << token << std::endl;
+                            }
+                            else if (tokens[0] == "CONNECT" || tokens[0] == "connect")
+                            {
+                                std::cout << "token(CONNECT): " << token << std::endl;
+                            }
+                            else if (tokens[0] == "quit" || tokens[0] == "QUIT")
+                            {
+                                std::cout << "token(QUIT): " << token << std::endl;
+                            }
+                            //
+                        }
+                        i++;
+                        flag = 1;
+                        std::cout <<"U>"<< tmp << std::endl;
+                        std::cout <<"U>"<< tmp.substr(4+1+1) << std::endl;
                     }
-                    else if (bytesRead == 0) {
-                        // connection closed by the client handle_disconnection
+                    if (flag == 1)
+                    {
+                        //std::cout << "token 0:" << tokens[i] << std::endl
                     }
+                    // size_t i = 0; i < lines.size(); ++i
+                    // for (const auto& line : lines) {
+                    // for (size_t i = 0; i < lines.size(); i++) {
+                    //     std::istringstream lineStream(line);
+                    //     std::string part;
+                    //     if (std::getline(lineStream, part, ' '))
+                    //     {
+                    //         std::cout << part << std::endl;
+                    //         if (part == "CAP"){
+                    //             cap = line.substr(part.length() + 1);
+                    //             std::cout << "==>" << line.substr(part.length() + 1) << std::endl;
+                    //         }
+                    //         if (part == "PASS"){
+                    //             pass = line.substr(part.length() + 1);
+                    //         }
+                    //         if (part == "NICK"){
+                    //             nick = line.substr(part.length() + 1);
+                    //         }
+                    //         if (part == "USER"){
+                    //             user = line.substr(part.length() + 1);
+                    //         }
+                    //     }
+                    // }
+                    /* == == == */
+                    // std::cout << "0" << cap << std::endl;
+                    // std::cout << "1" << pass << std::endl;
+                    // std::cout << "2" << nick << std::endl;
+                    // std::cout << "3" << user << std::endl;
+                    /* == == == */
+                    // do {
+                    //     std::string part;
+                    //     iss >> part;
+                    //     parts.push_back(part);
+                    // } while (iss);
+                    // //std::cout << parts[0] << parts[1]<< std::endl;
+                    // //std::string receivedData(buffer);
+                    // //std::cout << "" << std::endl;
+                    // // handle NICK cmd:
+                    // if (parts.size() >= 2 && parts[0] == "/nick") {
+                    //     // if user have already a name or wanna change it 
+                    //     // +] New Client Connected, Client IP Address 127.0.0.1   (clientId=)
+                    //     // throw catch error
+                    //     std::cout << "User " << parts[1] << " has set a nickname (" << std::endl;
+                    // }
+                    // // else if (parts.)
+                    // // {
+                    // //     //
+                    // // }
+                    // /* problem in sending receivng cmds */
+                    // // /server 127.0.0.1 1337 IRC-1337
+                    // else if (parts[0] == "/join") {
+                    //     std::cout << "user /join the channel | " << parts[0] << parts[1]  << "|" << std::endl;
+                    // }
+                    // else if (parts.size() >= 2 && parts[0] == "/PASS") {
+                    //     std::cout << "User has been set a password" << std::endl;
+                    // }
+                    // // == 2 !
+                    // else if (parts.size() == 2 && (parts[0] == "/EXIT" || parts[0] == "/QUIT")) {
+                    //     std::cout << "User exit the server" << parts.size() << std::endl;
+                    // }
+                    // else if (receivedBytes == 0) {
+                    //     // connection closed by the client handle_disconnection
+                    // }
                 }
             }
             if (this->_pfds[i].revents == 17 || this->_pfds[i].revents == POLLHUP) {
@@ -170,8 +310,18 @@ void    Server::start() {
 }
 
 /*
+Stream class to operate on strings.
+Objects of this class use a string buffer that contains a sequence of characters. This sequence of characters can be accessed directly as a string object, using member str.
+iss: input string stream.
+
+https://github.com/hikaarru/ft_irc/blob/main/srcs/server.cpp
+yascont/internet-relay-chat-server
+*/
+
+/*
 // Determine the size of the incoming message
-int messageSize = recv(_fds[i].fd, nullptr, 0, MSG_PEEK);
+// determine the size of the incoming message without actually removing any data from the socket.
+int messageSize = recv(_fds[i].fd, nullptr, 0, MSG_PEEK); // When MSG_PEEK is set, the data is "peeked at" but not actually consumed, so it will still be available for subsequent calls to recv.
 
 // Dynamically allocate a buffer based on the message size
 char* buffer = new char[messageSize];
@@ -188,7 +338,7 @@ delete[] buffer;
 
 Server::Server(std::string port, std::string password) {
     this->_port = atoi(port.c_str());
-    if (this->_port == 0 || (this->_port < 0 && this->_port > 65535))
+    if (this->_port == 0 || (this->_port < 0 || this->_port > 65535))
         throw std::runtime_error("Invalid port");
     this->_password = password;
     if (!(this->_password.length() >= 8 && this->_password.length() <= 16)) // != Password || empty

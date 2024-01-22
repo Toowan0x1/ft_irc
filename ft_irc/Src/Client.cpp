@@ -18,26 +18,26 @@
 //     /**/
 // }
 
-Client::Client(int &clientFD) :
-    //_clientFd(clientFD),
-    _addr(),
-    _username(""),
-    _nickname(""), // default nickname: "guest_"+${id}
-    _realName(""),
-    _password(""),
-    _buffer(""),
-    _authenticated(false),
-    _welcomed(false),
-    _registred(false),
-    _keepAlive(true) {
-        (void)clientFD;
-    // Additional constructor code if needed
-    // (void)clientFD; // Not needed as you are already using it in the initializer list
-}
-
-// Client::Client(int &clientFD) {
-    
+// Client::Client(int &clientFD) :
+//     //_clientFd(clientFD),
+//     _addr(),
+//     _username(""),
+//     _nickname(""), // default nickname: "guest_"+${id}
+//     _realName(""),
+//     _password(""),
+//     _buffer(""),
+//     _authenticated(false),
+//     _welcomed(false),
+//     _registred(false),
+//     _keepAlive(true) {
+//         (void)clientFD;
+//     // Additional constructor code if needed
+//     // (void)clientFD; // Not needed as you are already using it in the initializer list
 // }
+
+Client::Client(int &clientFD) {
+    this->_clientFd = clientFD;
+}
 
 Client::~Client() {
     /*
