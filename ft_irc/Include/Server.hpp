@@ -54,6 +54,8 @@ class Server {
         void    setServerAddrInfo();
         void    bindServerSocket();
         void    acceptConnection();
+        void    parse_cmd(std::string, int i);//int i
+        bool    startsWith(const std::string&, const std::string&);
         ~Server();
 };
 // clientPfds
