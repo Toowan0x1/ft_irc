@@ -115,54 +115,187 @@ bool    Server::startsWith(const std::string &str, const std::string &target)
     return (firstWord == target);
 }
 
+std::size_t     findFirstSpecialChar(std::string str) {
+    for (std::size_t i = 0; str.length(); i++) {
+        char currentChar = str[i];
+        if (currentChar == ' ' || currentChar == '\t' || currentChar == '\n' || currentChar == '\0')
+            return (i);
+    }
+    return std::string::npos;
+}
+
+int     countArguments(std::string line) {
+    std::istringstream iss(line);
+    std::string word;
+    int count;
+
+    while (iss >> word)
+        count++;
+    return (count);
+}
+
 void    Server::parse_cmd(std::string line, int i) {
     i = i -1; // because i = 1 and the index of clients starts from 0
     // this->_clientList[i]->_buffer = line;
     // std::cout << 0 << ":" << _clientList[i]->_buffer << std::endl;
+    // std::cout << "%" << line << "%" << std::endl;
     if (startsWith(line, "connect") || startsWith(line, "CONNECT")) {
         //std::cout << "yes> " << line << std::endl;
     }
-    if (startsWith(line, "pass") || startsWith(line, "PASS")) {
-        this->_clientList[i]->_authenticated = false;
-        //int j = line.find("PASS");
-        // if (line)
-            // this->_clientList[0]->_password = line.substr(j+1);
-        if (line.substr(4+1).compare("IRC-1337") == 0) {
-            this->_clientList[i]->_authenticated = true;
-            std::cout << "true" << std::endl;
+    else if (startsWith(line, "pass") || startsWith(line, "PASS")) {
+        int args = countArguments(line);
+        if (args > 1)
+        {
+            std::string cmd = "pass";
+            int start = cmd.length() + 1;
+            this->_clientList[i]->_authenticated = false; // dirha f init <defConstructor>
+            this->_clientList[i]->_password = line.substr(start);
+            //if (this->_clientList[i]->_password.compare(Server::_password) == 0)
+            if (this->_clientList[i]->_password.compare(Server::_password) == 0)
+            {
+                this->_clientList[i]->_authenticated = true;
+            }
+        }
+    }
+    else if (startsWith(line, "server") || startsWith(line, "SERVER")) {
+        /**/
+    }
+    else if (startsWith(line, "nick") || startsWith(line, "NICK")) {
+        int args = countArguments(line);
+        if (args > 1) {
+            std::string cmd = "nick";
+            int start = cmd.length() + 1;
+            int end = findFirstSpecialChar(line.substr(start));
+            this->_clientList[i]->_nickname = line.substr(start, end);
+        }
+    }
+    else if (startsWith(line, "user") || startsWith(line, "USER")) {
+        int args = countArguments(line);
+        if (args > 1 && args >= 5)
+        {
+            std::istringstream iss(line);
+            std::string arg1, arg2, arg3, arg4, arg5, tmp;
+            int ii = 0;
+            while (iss && ii <= args)
+            {
+                if (ii == 0) {
+                    /*donothing*/
+                }
+                else if (ii == 1)
+                    iss >> arg1;
+                else if (ii == 2)
+                    iss >> arg2;
+                else if (ii == 3)
+                    iss >> arg3;
+                else if (ii == 4)
+                    iss >> arg4;
+                else if (ii == 5)
+                {
+                    iss >> tmp;
+                    arg5 = tmp;
+                }
+                else if (ii > 5)
+                {
+                    arg5 += " ";
+                    iss >> tmp;
+                    arg5 += tmp;
+                }
+                ii++;
+            }
+            // Pick a nick:
+            // -<nickname>- This nickname is registred. Please choose a different nickname.
+            if (arg3.length() == 1 && (arg3[0] == '0' || arg3[0] == 'i'
+                    || arg3[0] == 'o' || arg3[0] == 'w'
+                    || arg3[0] == 'a' || arg3[0] == 'r')) {
+                        this->_clientList[i]->_userMode = arg3;
+                    /* ... */
+            } else {
+                std::cout << "[syntax error]: error in setting user mode!" << std::endl;
+                /* usage: i o w a r */
+            }
+            /* check double username */
+            std::vector<Client *> clientList;
+            clientList = this->_clientList;
+            size_t t = 0;
+            int res = 0;
+            while (t < clientList.size()) // > or <=
+            {
+                if (clientList[t]->_username == arg2)
+                    res = 1;
+                t++;
+            }
+            if (res == 0)
+                this->_clientList[i]->_username = arg2;
+            else {
+                std::cout << "-" << arg2 << "- This username is registred. Please choose a different username." << std::endl;
+            }
+
+            this->_clientList[i]->_username = arg2;
+            this->_clientList[i]->_userMode = arg3;
+            this->_clientList[i]->_realName = arg5;
+        }
+    }
+    else if (startsWith(line, "join") || startsWith(line, "JOIN")) {
+        /* banana */
+        /*
+        [client->server]
+        [client->server]:toowan@0 JOIN #seclab
+        */
+        /* #hackforums has been created! */
+        //check if authenticated and have nick, user, realname etc
+        // if user disconnected o dar connect next time, kaytra mochkil dyal double userNIckname
+        // 
+    }
+    else if (startsWith(line, "quit") || startsWith(line, "QUIT"))
+    {
+        int args = countArguments(line);
+        if (args > 1) {
+            std::string cmd = "quit";
+            int start = cmd.length() + 1;
+            this->_clientList[i]->_leaveMsg = ":";
+            this->_clientList[i]->_leaveMsg += line.substr(start);
+            // handle disconnect
         }
         else {
-            std::cout << "false" << std::endl;
+            this->_clientList[i]->_leaveMsg = ":Leaving the server";
+            // handle disconnect
         }
     }
-    if (startsWith(line, "server") || startsWith(line, "SERVER")) {
-        /**/
-    }
-    if (startsWith(line, "nick") || startsWith(line, "NICK")) {
-        this->_clientList[i]->_nickname = line.substr(4+1);
-        std::cout << "nick: " << this->_clientList[i]->_nickname << std::endl;
-    }
-    if (startsWith(line, "user") || startsWith(line, "USER")) {
-        /**/
-        this->_clientList[i]->_username = line.substr(4+1);
-        std::cout << "user: " << this->_clientList[i]->_username << std::endl;
-    }
-    if (startsWith(line, "join") || startsWith(line, "JOIN")) {
-        /**/
-    }
-    if (startsWith(line, "pass") || startsWith(line, "PASS"))
+    else if (startsWith(line, "whois") || startsWith(line, "WHOIS"))
     {
-        this->_clientList[i]->_password = line.substr(4+1);
-        std::cout << "pass: " << this->_clientList[i]->_password << std::endl;
+        int args = countArguments(line);
+        if (args > 1) {
+            std::string cmd = "whois";
+            int start = cmd.length() + 1;
+            if (this->_clientList[i]->_nickname == line.substr(start)) // clean code it
+            {
+                /* if whois <my_nickname> */
+            }
+            /* else */
+
+            std::vector<Client *> clientList;
+            clientList = this->_clientList;
+            size_t i = 0; // change i to j or y or whatever
+            while (i < clientList.size())
+            {
+                if (clientList[i]->_nickname == line.substr(start)) {
+                    std::cout << "==========================================================" << std::endl;
+                    std::cout << "userName:\t\"" << this->_clientList[i]->_username << "\"" << std::endl;
+                    std::cout << "realName:\t\"" << this->_clientList[i]->_realName << "\"" << std::endl;
+                    std::cout << "nickName:\t\"" << this->_clientList[i]->_nickname << "\"" << std::endl;
+                    std::cout << "userMode:\t\"" << this->_clientList[i]->_userMode << "\"" << std::endl;
+                    std::cout << "passWord:\t\"" << this->_clientList[i]->_password << "\"" << std::endl;
+                    std::cout << "IP Address:\t\"" << this->_clientList[i]->_IPAddress << "\"" << std::endl;
+                    std::cout << "authenticated:\t\"" << this->_clientList[i]->_authenticated << "\"" << std::endl;
+                    std::cout << "keepAlive:\t\"" << this->_clientList[i]->_keepAlive << "\"" << std::endl;
+                    std::cout << "leaveMsg:\t\"" << this->_clientList[i]->_leaveMsg << "\"" << std::endl;
+                    std::cout << "==========================================================" << std::endl;
+                    break ;
+                }
+                ++i; //i++;
+            }
+        }
     }
-    if (startsWith(line, "listz") || startsWith(line, "LISTZ")) {
-        /**/
-        std::cout << "authenticated " << this->_clientList[i]->_authenticated << std::endl;
-        std::cout << "pass " << this->_clientList[i]->_password << std::endl;
-        std::cout << "user " << this->_clientList[i]->_username << std::endl;
-        std::cout << "nick " << this->_clientList[i]->_nickname << std::endl;
-    }
-    
     // realname  _buffer
 }
 
@@ -209,7 +342,14 @@ void    Server::start() {
                     std::string line;
                     while (std::getline(iss, line, '\n'))
                     {
-                        //std::cout << "line: " << line << std::endl;
+                        int h = 0;
+                        while (line[h])
+                        {
+                            if ((int)line[h] == 13) // Remove the carriage return
+                                line.erase(h, 1);
+                            h++;
+                        }
+                        // std::cout << "$" << line << "$" << std::endl;
                         parse_cmd(line, i);
                     }
                 }

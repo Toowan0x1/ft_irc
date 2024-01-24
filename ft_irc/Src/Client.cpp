@@ -35,7 +35,7 @@
 //     // (void)clientFD; // Not needed as you are already using it in the initializer list
 // }
 
-Client::Client(int &clientFD) {
+Client::Client(int &clientFD) : _keepAlive(1) {
     this->_clientFd = clientFD;
 }
 
