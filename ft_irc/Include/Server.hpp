@@ -57,6 +57,8 @@ class Server {
         void    parse_cmd(std::string, int i);//int i
         bool    startsWith(const std::string&, const std::string&);
         ~Server();
+
+        void AcceptMsg(int i);
 };
 // clientPfds
 // serverPfd

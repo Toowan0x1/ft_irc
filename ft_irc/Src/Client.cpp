@@ -35,8 +35,13 @@
 //     // (void)clientFD; // Not needed as you are already using it in the initializer list
 // }
 
-Client::Client(int &clientFD) : _keepAlive(1) {
-    this->_clientFd = clientFD;
+Client::Client(int &clientFD) : 
+    _keepAlive(1)
+    //_registred(0),
+    //_authenticated(0),
+    //_welcomed(0)
+    {
+        this->_clientFd = clientFD;
 }
 
 Client::~Client() {

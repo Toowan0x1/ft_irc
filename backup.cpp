@@ -6,7 +6,7 @@
 /*   By: oel-houm <oel-houm@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 13:27:00 by oel-houm          #+#    #+#             */
-/*   Updated: 2024/01/18 13:27:01 by oel-houm         ###   ########.fr       */
+/*   Updated: 2024/01/25 20:43:33 by oel-houm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void    Server::acceptConnection() {
     //int sa = getnameinfo((sockaddr*)&client, sizeof(client), hbuf, sizeof(hbuf), sbuf, sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV);
     // if (sa == 0)
         // std::cout << "Accepted connection on descriptor " << clientSocket << "(host=" << hbuf << ", port=" << sbuf << ")" << std::endl;
+    // // adding it to POLL's array of sruct so it get monitored as well 
     pollfd pfd;
     pfd.fd = clientSocketFd;
     pfd.events = POLLIN;
@@ -114,8 +115,7 @@ int     countArguments(std::string line) {
 }
 
 void    Server::parse_cmd(std::string line, int i) {
-    i = i - 1; // because i = 1 and the index of clients starts from 0
-    std::cout << "clientFd=" << i << std::endl;
+    i = i -1; // because i = 1 and the index of clients starts from 0
     // this->_clientList[i]->_buffer = line;
     // std::cout << 0 << ":" << _clientList[i]->_buffer << std::endl;
     // std::cout << "%" << line << "%" << std::endl;
@@ -239,14 +239,6 @@ void    Server::parse_cmd(std::string line, int i) {
         else {
             this->_clientList[i]->_leaveMsg = ":Leaving the server";
             // handle disconnect
-            std::string nickname = this->_clientList[i]->_nickname;
-            int fd;
-            fd = this->_pfds[i+1].fd;
-            delete this->_clientList[i];//
-            this->_clientList.erase(this->_clientList.begin() + i);//
-            this->_pfds.erase(this->_pfds.begin() + i + 1);
-            close(fd);
-            std::cout << "~" << nickname << " has been disconnected" << std::endl;
         }
     }
     else if (startsWith(line, "whois") || startsWith(line, "WHOIS"))
@@ -296,19 +288,8 @@ void    Server::AcceptMsg(int i) {
     if (receivedBytes < 0) {
         std::runtime_error("recv error");
     }
-    // if (bytesRead <= 0) { handle diconnection of client here }
-    else if (receivedBytes == 0) { // the recv call will return 0 or a negative value, indicating that the client has closed the connection.
-        /* if the client disconnected */
-        // handle disconnection here
-        i = i -1;
-        std::string nickname = this->_clientList[i]->_nickname;
-        int fd;
-        fd = this->_pfds[i+1].fd;
-        delete this->_clientList[i];//
-        this->_clientList.erase(this->_clientList.begin() + i);//
-        this->_pfds.erase(this->_pfds.begin() + i + 1);
-        close(fd);
-        std::cout << "~" << nickname << " has been disconnected" << std::endl;
+    else if (receivedBytes == 0) {
+        /**/
     }
     else if (receivedBytes > 0) {
         buffer[receivedBytes] = '\0';
@@ -316,12 +297,12 @@ void    Server::AcceptMsg(int i) {
         std::string line;
         while (std::getline(iss, line, '\n'))
         {
-            int ii = 0;
-            while (line[ii])
+            int i = 0;
+            while (line[i])
             {
-                if ((int)line[ii] == 13)
-                    line.erase(ii, 1);
-                ii++;
+                if ((int)line[i] == 13)
+                    line.erase(i, 1);
+                i++;
             }
             parse_cmd(line, i);
         }
@@ -355,18 +336,23 @@ void    Server::start() {
             if (this->_pfds[i].revents == POLLIN && this->_pfds[i].fd == this->_serverSocketFd)
                 acceptConnection();
             if (this->_pfds[i].revents == POLLIN && this->_pfds[i].fd != this->_serverSocketFd) {
+                std::cout << "client send a msg" << std::endl;
                 AcceptMsg(i); //recvmsgs
             }
             if (this->_pfds[i].revents == 17 || this->_pfds[i].revents == POLLHUP)
-            // if (this->_pfds[i].revents & POLLHUP || this->_pfds[i].revents & POLLERR)
             {
-                int fd;
-                fd = this->_pfds[i].fd;
-                delete this->_clientList[i - 1];
-                this->_clientList.erase(this->_clientList.begin() + i - 1);
-                this->_pfds.erase(this->_pfds.begin() + i);
-                close(fd);
-                std::cout << "Client disconnected" << std::endl;
+                std::cout << "Client Disconnected" << std::endl;
+
+
+                /**/
+                // int fd;
+                // fd = this->_pfds[i].fd;
+                // delete this->_clientList[i - 1];
+                // this->_clientList.erase(this->_clientList.begin() + i - 1);
+                // this->_pfds.erase(this->_pfds.begin() + i);
+                // close(fd);
+
+
                 // if (this->_fds[i].revents & (POLLHUP | POLLERR)) {
                 // handleDisconnect();
             }
