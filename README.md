@@ -30,11 +30,11 @@ Some extra features to be added into IRC server so it looks even more like and a
   ```
 - Run the IRC server:
      ```sh
-    ./ircserv [SERVER_PORT] [SERVER_PASSWORD]
+    ./ircserv <SERVER_PORT> <SERVER_PASSWORD>
     ```
 - Connect from client. e.g. hexchat:
     ```sh
-    /server [SERVER_IP] [SERVER_PORT] [SERVER_PASSWORD]
+    /server <SERVER_IP> <SERVER_PORT> <SERVER_PASSWORD>
     ```
 ## Lessons
 - Socket programming & multiplixing
@@ -45,7 +45,7 @@ Some extra features to be added into IRC server so it looks even more like and a
 - [x] USER
 - [x] NICK
 - [x] PASS
-- [ ] JOIN
+- [x] JOIN
 - [ ] MSG
 - [ ] PRIVMSG
 - [ ] LIST
