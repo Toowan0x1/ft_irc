@@ -225,6 +225,37 @@ void    Server::parse_cmd(std::string line, int i) {
         //check if authenticated and have nick, user, realname etc
         // if user disconnected o dar connect next time, kaytra mochkil dyal double userNIckname
         // 
+        int args = countArguments(line);
+        if (args > 1 && args == 2)
+        {
+            std::string arg1, arg2;
+            std::istringstream iss(line);
+            int k = 0;
+            while (iss && k < args)
+            {
+                if (k == 0)
+                    iss >> arg1;
+                if (k == 1)
+                    iss >> arg2;
+                k++;
+            }
+            // channel names MUST start with #
+            if (arg2[0] != '#') {
+                /**/
+            }
+            // Creating new channel
+            Channel *newChannel = new Channel(arg2);//arg2 channel
+            this->_channels.push_back(newChannel);
+            // add a user to channel members
+            newChannel->_members.push_back(this->_clientList[i]); // clientlist i + 1 -1 
+            /* inform everyone that user has joined
+                ...
+            */
+        }
+        else{
+            //("461 " + _nickName + " JOIN :Not enough parameters");
+            //std::cout << "" << std::endl;
+        }
     }
     else if (startsWith(line, "quit") || startsWith(line, "QUIT"))
     {
@@ -341,6 +372,8 @@ void    Server::start() {
     }
     std::cout << "[*] Listening ..." << std::endl;
     
+    /* non-blocking sockets, are often used in scenarios where you want to handle multiple
+    connections or perform other tasks while waiting for socket operations to complete. */
     if (fcntl(this->_serverSocketFd, F_SETFL, O_NONBLOCK) == -1) {
         std::runtime_error("Error setting socket to non-blocking mode");
     }
@@ -414,31 +447,3 @@ Server::~Server() {
 // handle password before joining channel
 // return "464 :Password incorrect\r\n";
 // setRegistred true => false 
-
-/*
-sudo apt-get install inspircd   # Debian/Ubuntu
-sudo nano /etc/inspircd/inspircd.conf
-sudo service inspircd start   # On Linux
-/msg ChanServ REGISTER #channel_name
-*/
-
-/*
-Stream class to operate on strings.
-Objects of this class use a string buffer that contains a sequence of characters. This sequence of characters can be accessed directly as a string object, using member str.
-iss: input string stream.
-
-{
-    // Determine the size of the incoming message without actually removing any data from the socket.
-    int messageSize = recv(_fds[i].fd, nullptr, 0, MSG_PEEK); // When MSG_PEEK is set, the data is "peeked at" but not actually consumed, so it will still be available for subsequent calls to recv.
-
-    // Dynamically allocate a buffer based on the message size
-    char* buffer = new char[messageSize];
-
-    // Receive the complete message
-    int bytesRead = recv(_fds[i].fd, buffer, messageSize, 0);
-
-    // Process the message as before...
-
-    // Don't forget to free the allocated memory when done
-    delete[] buffer;
-} */

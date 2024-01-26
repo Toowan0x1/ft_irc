@@ -19,9 +19,14 @@
 
 class   Channel {
     private:
-        std::string _name;
+        //std::string _name;
+        //std::vector<Client *> _members;
     public:
+        std::string _name;
+        std::vector<Client *> _members;
         Channel();
+        Channel(std::string channel);
+        ~Channel();
 };
 
 #endif

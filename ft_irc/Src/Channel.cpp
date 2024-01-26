@@ -10,4 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../Include/Channel.hpp"
 
+Channel::Channel() {
+    /**/
+}
+
+Channel::Channel(std::string channel) {
+    /**/
+}
+
+Channel::~Channel() {
+    /**/
+}

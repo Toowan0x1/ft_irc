@@ -65,7 +65,4 @@ class   Client {
         ~Client();
 };
 
-
-
-
 #endif
