@@ -340,6 +340,7 @@ void    Server::AcceptMsg(int i) {
         this->_pfds.erase(this->_pfds.begin() + i + 1);
         close(fd);
         std::cout << "~" << nickname << " has been disconnected" << std::endl;
+        std::cout << "[-] " << "~" << nickname << " has been disconnected" << std::endl;
     }
     else if (receivedBytes > 0) {
         buffer[receivedBytes] = '\0';

@@ -32,6 +32,7 @@
 #include <cstring>      // For C-style string manipulation functions
 
 class Client;
+class Channel;
 
 class Server {
     private:
