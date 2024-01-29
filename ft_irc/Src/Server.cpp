@@ -37,9 +37,11 @@ void    Server::handleNewConnection()
     
     if (fcntl(clientSocketFd, F_SETFL, O_NONBLOCK) == -1)
         throw std::runtime_error("Error setting client socket to non-blocking mode!");
-    //int sa = getnameinfo((sockaddr*)&client, sizeof(client), hbuf, sizeof(hbuf), sbuf, sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV);
-    // if (sa == 0)
-        // std::cout << "Accepted connection on descriptor " << clientSocket << "(host=" << hbuf << ", port=" << sbuf << ")" << std::endl;
+    /*
+    int sa = getnameinfo((sockaddr*)&client, sizeof(client), hbuf, sizeof(hbuf), sbuf, sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV);
+    if (sa == 0)
+        std::cout << "Accepted connection on descriptor " << clientSocket << "(host=" << hbuf << ", port=" << sbuf << ")" << std::endl;
+    */
     pollfd pfd;
     pfd.fd = clientSocketFd;
     pfd.events = POLLIN;
@@ -92,18 +94,6 @@ void    Server::bindServerSocket()
     }
 }
 
-std::vector<std::string> split(const std::string &s, char delimiter) {
-    std::vector<std::string> tokens;
-    std::istringstream ss(s);
-    std::string token;
-
-    while (std::getline(ss, token, delimiter)) {
-        tokens.push_back(token);
-    }
-
-    return tokens;
-}
-
 bool    Server::startsWith(const std::string &str, const std::string &target)
 {
     size_t spacePos = str.find(' '); // "        cmd    " spaces before the cmd!
@@ -120,10 +110,10 @@ std::size_t     findFirstSpecialChar(std::string str) {
     return std::string::npos;
 }
 
-int     countArguments(std::string line) {
+int     countArguments(std::string line) { // countCommandArgs
     std::istringstream iss(line);
     std::string word;
-    int count;
+    int count = 0;
 
     while (iss >> word)
         count++;
@@ -184,7 +174,8 @@ void    Server::parse_cmd(std::string line, int i) {
                 if (this->_clientList[t]->_nickname == arg2) {
                     isDuplicated = true;
                     // print ~nickname <nick>
-                    const char *msg = "This nickname is registred. Please choose a different nickname.\n";
+                    std::string msggggg = "~" + arg2 + " nickname is registred. Please choose a different nickname.\n";
+                    const char *msg = msggggg.c_str();
                     if (send(this->_clientList[i]->_clientFd, msg, strlen(msg), 0) < 0) {
                         std::cout << "Send failed!" << std::endl;
                     }
@@ -407,7 +398,7 @@ void    Server::start() {
         }
         // disconnect the client if the _keepAlive boolean is false 
         for (unsigned int i = 0; i < this->_clientList.size(); i++) {
-            if (this->_clientList[i]->_keepAlive)
+            if (this->_clientList[i]->_keepAlive == 0)
                 handleDisconnection(i);
         }
     }
@@ -449,3 +440,20 @@ Server::~Server() {
 
 // TO DO:
 // when someone change his nickname inform all the channel members,
+
+
+
+
+/*
+std::vector<std::string> split(const std::string &s, char delimiter) {
+    std::vector<std::string> tokens;
+    std::istringstream ss(s);
+    std::string token;
+
+    while (std::getline(ss, token, delimiter)) {
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+*/

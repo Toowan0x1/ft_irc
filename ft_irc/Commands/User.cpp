@@ -18,79 +18,112 @@
 static int     countArguments(std::string line) {
     std::istringstream iss(line);
     std::string word;
-    int count;
+    int count = 0;
 
     while (iss >> word)
         count++;
     return (count);
 }
 
-void    Server::User(std::string line, int clientFd)
+void    sendMsg(int fd, std::string msg)
+{
+    const char *msssg = msg.c_str();
+    size_t msgSize = strlen(msssg);
+    if (send(fd, msssg, msgSize, 0) < 0) {
+        std::cout << "send failed" << std::endl;
+    }
+}
+
+
+struct IsAlpha {
+    bool operator()(char c) const {
+        return std::isalpha(c);
+    }
+};
+
+bool isOnlyLetters(const std::string& str) {
+    return std::all_of(str.begin(), str.end(), IsAlpha());
+}
+
+// Example: /user <username> <usermode> * :<realname>
+void    Server::User(std::string line, int i)
 {
     int args = countArguments(line);
     if (args >= 5)
     {
         std::stringstream iss(line);
-        std::string arg1, arg2, arg3, arg4, arg5, tmp;
-        int i = 0;
-        while (iss && i <= args)
+        std::string cmd, username, usermode, hostname, realname, tmp;
+
+        // loop on arguments
+        int j = 0;
+        while (iss && j <= args)
         {
-            if (i == 0) {
-                //donothing//
-            }
-            else if (i == 1)
-                iss >> arg1;
-            else if (i == 2)
-                iss >> arg2;
-            else if (i == 3)
-                iss >> arg3;
-            else if (i == 4)
-                iss >> arg4;
-            else if (i == 5)
+            if (j == 1)
+                iss >> cmd;
+            else if (j == 2)
+                iss >> username;
+            else if (j == 3)
+                iss >> usermode;
+            else if (j == 4)
+                iss >> hostname; // Placeholder for hostname or Ip.
+            else if (j == 5)
             {
                 iss >> tmp;
-                arg5 = tmp;
+                realname = tmp;
             }
-            else if (i > 5)
+            else if (j > 5)
             {
-                arg5 += " ";
+                realname += " ";
                 iss >> tmp;
-                arg5 += tmp;
+                realname += tmp;
             }
-            i++;
-        }
-        i = clientFd;
-        // Pick a nick:
-        // -<nickname>- This nickname is registred. Please choose a different nickname.
-        if (arg3.length() == 1 && (arg3[0] == '0' || arg3[0] == 'i'
-                || arg3[0] == 'o' || arg3[0] == 'w'
-                || arg3[0] == 'a' || arg3[0] == 'r')) {
-                    this->_clientList[i]->_userMode = arg3;
-                /* ... */
-        } else {
-            std::cout << "[syntax error]: error in setting user mode!" << std::endl;
-            /* usage: i o w a r */
-        }
-        /* check double username */
-        std::vector<Client *> clientList;
-        clientList = this->_clientList;
-        size_t t = 0;
-        int res = 0;
-        while (t < clientList.size()) // > or <=
-        {
-            if (clientList[t]->_username == arg2)
-                res = 1;
-            t++;
-        }
-        if (res == 0)
-            this->_clientList[i]->_username = arg2;
-        else {
-            std::cout << "-" << arg2 << "- This username is registred. Please choose a different username." << std::endl;
+            j++;
         }
 
-        this->_clientList[i]->_username = arg2;
-        this->_clientList[i]->_userMode = arg3;
-        this->_clientList[i]->_realName = arg5;
+        // check usermodes:
+        if (usermode.length() == 1 && (usermode[0] == '0' || usermode[0] == 'i'
+                || usermode[0] == 'o' || usermode[0] == 'w'
+                || usermode[0] == 'a' || usermode[0] == 'r'))
+        {
+                this->_clientList[i]->_userMode = usermode;
+        }
+        else {
+            sendMsg(this->_clientList[i]->_clientFd,"Invalid mode. Please enter one of the valid modes (i, o, w, a, r).\n");
+        }
+
+        // check double username:
+        std::vector<Client *> clientList;
+        clientList = this->_clientList;
+        size_t k = 0;
+        int res = 0;
+        while (k < clientList.size()) // or <=
+        {
+            if (clientList[k]->_username == username)
+                res = 1;
+            k++;
+        }
+        if (res == 0)
+            this->_clientList[i]->_username = username;
+        else {
+            std::string msg = "@" + username + " username is registred. Please choose a different username.\n";
+            sendMsg(this->_clientList[i]->_clientFd, msg);
+        }
+
+        // check realname:
+        if (realname.length() >= 35 && isOnlyLetters(realname))
+        {
+            std::string msg = "Invalid realname. Please ensure it has at most 35 characters and contains only letters.\n"; ///
+            sendMsg(this->_clientList[i]->_clientFd, msg);
+        }
+        else
+        {
+            this->_clientList[i]->_realName = realname;
+            std::cout << "Real name set to: " << realname << std::endl;
+        }
+
+        //this->_clientList[i]->_username = username;
+        //this->_clientList[i]->_userMode = usermode;
+        //this->_clientList[i]->_realName = realname;
     }
 }
 
