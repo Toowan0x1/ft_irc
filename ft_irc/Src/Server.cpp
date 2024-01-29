@@ -143,77 +143,44 @@ void    Server::parse_cmd(std::string line, int i) {
     else if (startsWith(line, "nick") || startsWith(line, "NICK")) {
         int args = countArguments(line);
         if (args > 1) {
-            std::string cmd = "nick";
-            int start = cmd.length() + 1;
-            int end = findFirstSpecialChar(line.substr(start));
-            this->_clientList[i]->_nickname = line.substr(start, end);
+            /* n7ydo hadchi li hna o ndiro istringstream */
+            // std::string cmd = "nick";
+            // int start = cmd.length() + 1;
+            // int end = findFirstSpecialChar(line.substr(start));
+            // this->_clientList[i]->_nickname = line.substr(start, end);
+            
+            // check if nick args provided more than 2 wla hexchat behavior works in another way (test it before implement)
+
+            std::istringstream iss(line);
+            size_t t = 0;
+            std::string arg1, arg2;
+            while (iss && t < 2) {
+                if (t == 0)
+                    iss >> arg1;
+                if (t == 1)
+                    iss >> arg2;
+                t++;
+            }
+            t = 0;
+            bool isDuplicated = false;
+            while (t < this->_clientList.size()) {
+                if (this->_clientList[t]->_nickname == arg2) {
+                    isDuplicated = true;
+                    // print ~nickname <nick>
+                    const char *msg = "This nickname is registred. Please choose a different nickname.\n";
+                    if (send(this->_clientList[i]->_clientFd, msg, strlen(msg), 0) < 0) {
+                        std::cout << "Send failed!" << std::endl;
+                    }
+                    break ;
+                }
+                t++;
+            }
+            if (isDuplicated != true)
+                this->_clientList[i]->_nickname = arg2;
         }
     }
     else if (startsWith(line, "user") || startsWith(line, "USER")) {
-        int args = countArguments(line);
-        if (args > 1 && args >= 5)
-        {
-            std::istringstream iss(line);
-            std::string arg1, arg2, arg3, arg4, arg5, tmp;
-            int ii = 0;
-            while (iss && ii <= args)
-            {
-                if (ii == 0) {
-                    /*donothing*/
-                }
-                else if (ii == 1)
-                    iss >> arg1;
-                else if (ii == 2)
-                    iss >> arg2;
-                else if (ii == 3)
-                    iss >> arg3;
-                else if (ii == 4)
-                    iss >> arg4;
-                else if (ii == 5)
-                {
-                    iss >> tmp;
-                    arg5 = tmp;
-                }
-                else if (ii > 5)
-                {
-                    arg5 += " ";
-                    iss >> tmp;
-                    arg5 += tmp;
-                }
-                ii++;
-            }
-            // Pick a nick:
-            // -<nickname>- This nickname is registred. Please choose a different nickname.
-            if (arg3.length() == 1 && (arg3[0] == '0' || arg3[0] == 'i'
-                    || arg3[0] == 'o' || arg3[0] == 'w'
-                    || arg3[0] == 'a' || arg3[0] == 'r')) {
-                        this->_clientList[i]->_userMode = arg3;
-                    /* ... */
-            } else {
-                std::cout << "[syntax error]: error in setting user mode!" << std::endl;
-                /* usage: i o w a r */
-            }
-            /* check double username */
-            std::vector<Client *> clientList;
-            clientList = this->_clientList;
-            size_t t = 0;
-            int res = 0;
-            while (t < clientList.size()) // > or <=
-            {
-                if (clientList[t]->_username == arg2)
-                    res = 1;
-                t++;
-            }
-            if (res == 0)
-                this->_clientList[i]->_username = arg2;
-            else {
-                std::cout << "-" << arg2 << "- This username is registred. Please choose a different username." << std::endl;
-            }
-
-            this->_clientList[i]->_username = arg2;
-            this->_clientList[i]->_userMode = arg3;
-            this->_clientList[i]->_realName = arg5;
-        }
+        User(line, i);
     }
     else if (startsWith(line, "join") || startsWith(line, "JOIN")) {
         /* banana */
@@ -251,6 +218,10 @@ void    Server::parse_cmd(std::string line, int i) {
             /* inform everyone that user has joined
                 ...
             */
+            if (send(this->_clientList[i]->_clientFd, "joined general\n", 16, 0) < 0)
+            {
+                //
+            }
         }
         else{
             //("461 " + _nickName + " JOIN :Not enough parameters");
@@ -282,6 +253,16 @@ void    Server::parse_cmd(std::string line, int i) {
     }
     else if (startsWith(line, "whois") || startsWith(line, "WHOIS"))
     {
+        if (this->_clientList[i]->_authenticated == false) {
+            //send msg to client
+            const char *msg = "Not authenticated yet! Enter a valid password\n";
+            int msgsize = strlen(msg);
+            int bytesSend = send(this->_clientList[i]->_clientFd, msg, msgsize, 0);
+            if (bytesSend < 0) {
+                //
+                std::cout << "send failed" << std::endl;
+            }
+        } else {
         int args = countArguments(line);
         if (args > 1) {
             std::string cmd = "whois";
@@ -295,26 +276,47 @@ void    Server::parse_cmd(std::string line, int i) {
 
             std::vector<Client *> clientList;
             clientList = this->_clientList;
+            int fddd = i;
             size_t i = 0; // change i to j or y or whatever
+            bool found = false;
             while (i < clientList.size())
             {
                 if (clientList[i]->_nickname == line.substr(start)) {
-                    std::cout << "==========================================================" << std::endl;
-                    std::cout << "userName:\t\"" << this->_clientList[i]->_username << "\"" << std::endl;
-                    std::cout << "realName:\t\"" << this->_clientList[i]->_realName << "\"" << std::endl;
-                    std::cout << "nickName:\t\"" << this->_clientList[i]->_nickname << "\"" << std::endl;
-                    std::cout << "userMode:\t\"" << this->_clientList[i]->_userMode << "\"" << std::endl;
-                    std::cout << "passWord:\t\"" << this->_clientList[i]->_password << "\"" << std::endl;
-                    std::cout << "IP Address:\t\"" << this->_clientList[i]->_IPAddress << "\"" << std::endl;
-                    std::cout << "authenticated:\t\"" << this->_clientList[i]->_authenticated << "\"" << std::endl;
-                    std::cout << "keepAlive:\t\"" << this->_clientList[i]->_keepAlive << "\"" << std::endl;
-                    std::cout << "leaveMsg:\t\"" << this->_clientList[i]->_leaveMsg << "\"" << std::endl;
-                    std::cout << "==========================================================" << std::endl;
+                    std::string sendMsg;;
+                    sendMsg = "==========================================================\n";
+                    sendMsg += "userName:\t" + this->_clientList[i]->_username + "\n";
+                    sendMsg += "realName:\t" + this->_clientList[i]->_realName + "\n";
+                    sendMsg += "nickName:\t" + this->_clientList[i]->_nickname + "\n";
+                    sendMsg += "userMode:\t" + this->_clientList[i]->_userMode + "\n";
+                    sendMsg += "IP Address:\t" + this->_clientList[i]->_IPAddress + "\n";
+                    std::string authenticated = "No";
+                    if (this->_clientList[i]->_authenticated == true) {
+                        authenticated = "Yes";
+                    }
+                    sendMsg += "authenticated:\t" + authenticated + "\n";
+                    sendMsg += "leaveMsg:\t" + this->_clientList[i]->_leaveMsg + "\n";
+                    sendMsg += "==========================================================\n";
+                    const char *sendMsg2 = sendMsg.c_str();
+                    size_t msgSize = strlen(sendMsg2);
+                    // Use ssize_t for the return type of send
+                    ssize_t bytesSent = send(this->_clientList[fddd]->_clientFd, sendMsg2, msgSize, 0);
+                    if (bytesSent < 0) {
+                        std::cout << "send failed!" << std::endl;
+                    }
+
+                    found = true;
                     break ;
                 }
                 ++i; //i++;
             }
-        }
+            if (found == false) {
+                std::string msgS = "There is no user with nickname ~" + nickname + "\n";
+                const char *msgS2 = msgS.c_str();
+                if (send(this->_clientList[fddd]->_clientFd, msgS2, strlen(msgS2), 0) < 0) {
+                    std::cout << "send failed!" << std::endl;
+                }
+            }
+        } }
     }
     // realname  _buffer
 }
@@ -340,7 +342,6 @@ void    Server::AcceptMsg(int i) {
         this->_pfds.erase(this->_pfds.begin() + i + 1);
         close(fd);
         std::cout << "~" << nickname << " has been disconnected" << std::endl;
-        std::cout << "[-] " << "~" << nickname << " has been disconnected" << std::endl;
     }
     else if (receivedBytes > 0) {
         buffer[receivedBytes] = '\0';
@@ -355,6 +356,7 @@ void    Server::AcceptMsg(int i) {
                     line.erase(ii, 1);
                 ii++;
             }
+            std::cout << "cmd: $" << line << "$" << std::endl;
             parse_cmd(line, i);
         }
     }
@@ -448,3 +450,6 @@ Server::~Server() {
 // handle password before joining channel
 // return "464 :Password incorrect\r\n";
 // setRegistred true => false 
+
+// TO DO:
+// when someone change his nickname inform all the channel members,

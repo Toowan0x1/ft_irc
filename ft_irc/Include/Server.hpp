@@ -53,10 +53,12 @@ class Server {
         void    bindServerSocket();
         void    acceptConnection();
         void    parse_cmd(std::string, int i);//int i
+        void    User(std::string line, int clientFd);
+        
         bool    startsWith(const std::string&, const std::string&);
         ~Server();
-
-        void AcceptMsg(int i);
+        void    AcceptMsg(int i);
+        
 };
 // clientPfds
 // serverPfd
