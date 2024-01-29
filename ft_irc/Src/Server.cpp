@@ -14,12 +14,27 @@
 #include "../Include/Client.hpp"
 #include "../Include/Channel.hpp"
 
-void    Server::acceptConnection() {
+void    Server::handleDisconnection(int i) {
+    i = i - 1; // because i = 1 and the index of clients starts from 0
+    std::string nickname = this->_clientList[i]->_nickname;
+    int fd;
+    fd = this->_pfds[i + 1].fd;
+    delete this->_clientList[i];
+    this->_clientList.erase(this->_clientList.begin() + i);
+    this->_pfds.erase(this->_pfds.begin() + i + 1);
+    close(fd);
+    std::cout << "~" << nickname << " has been disconnected" << std::endl;
+}
+
+void    Server::handleNewConnection()
+{
     struct sockaddr_in clientAddr;
     socklen_t clientSize = sizeof(clientAddr);
+
     int clientSocketFd = accept(this->_serverSocketFd, (sockaddr*)&clientAddr, &clientSize);
     if (clientSocketFd < 0)
         throw std::runtime_error("ERROR: Problem with client connecting!");
+    
     if (fcntl(clientSocketFd, F_SETFL, O_NONBLOCK) == -1)
         throw std::runtime_error("Error setting client socket to non-blocking mode!");
     //int sa = getnameinfo((sockaddr*)&client, sizeof(client), hbuf, sizeof(hbuf), sbuf, sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV);
@@ -30,14 +45,15 @@ void    Server::acceptConnection() {
     pfd.events = POLLIN;
     pfd.revents = 0;
     this->_pfds.push_back(pfd);
-    //
+
     Client *my_client = new Client(clientSocketFd);
     my_client->_IPAddress = inet_ntoa(clientAddr.sin_addr);
     this->_clientList.push_back(my_client);
     std::cout << "[+] New Client Connected, Client IP Address " << my_client->_IPAddress << std::endl;
 }
 
-void    Server::setServerSocket() {
+void    Server::setServerSocket()
+{
     int optValue = 1;
     this->_serverSocketFd = socket(AF_INET, SOCK_STREAM, 0);
     if (this->_serverSocketFd < 0)
@@ -48,32 +64,33 @@ void    Server::setServerSocket() {
         throw std::runtime_error("Failed to set socket to non-blocking mode");
 }
 
-void    Server::setServerAddrInfo() {
+void    Server::setServerAddrInfo()
+{
     memset(&this->_addr, 0, sizeof(this->_addr));
+
     this->_addr.sin_family = AF_INET;
     this->_addr.sin_addr.s_addr = INADDR_ANY;
     this->_addr.sin_port = htons(this->_port);
+    
     char hostname[256];
-    if (gethostname(hostname, sizeof(hostname)) == 0) {
+    if (gethostname(hostname, sizeof(hostname)) == 0)
         this->_hostname = hostname;
-    } else {
+    else
         throw std::runtime_error("Error getting hostname");
-    }
+
     struct pollfd serverPfd;
     serverPfd.fd = this->_serverSocketFd;
     serverPfd.events = POLLIN;
     serverPfd.revents = 0;
-    // eq to this->_pfds[0] = serverPfd;
     this->_pfds.push_back(serverPfd);
 }
 
-void    Server::bindServerSocket() {
+void    Server::bindServerSocket()
+{
     if (bind(this->_serverSocketFd, (struct sockaddr*)&this->_addr, sizeof(this->_addr)) < 0) {
         throw std::runtime_error("Failed to bind the server socket");
     }
 }
-
-
 
 std::vector<std::string> split(const std::string &s, char delimiter) {
     std::vector<std::string> tokens;
@@ -322,26 +339,18 @@ void    Server::parse_cmd(std::string line, int i) {
 }
 
 void    Server::AcceptMsg(int i) {
-    //
+    // use client buffer instead
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
+
     int receivedBytes = recv(this->_pfds[i].fd, buffer, sizeof(buffer), 0);
     if (receivedBytes < 0) {
         std::runtime_error("recv error");
     }
-    // if (bytesRead <= 0) { handle diconnection of client here }
-    else if (receivedBytes == 0) { // the recv call will return 0 or a negative value, indicating that the client has closed the connection.
-        /* if the client disconnected */
-        // handle disconnection here
-        i = i -1;
-        std::string nickname = this->_clientList[i]->_nickname;
-        int fd;
-        fd = this->_pfds[i+1].fd;
-        delete this->_clientList[i];//
-        this->_clientList.erase(this->_clientList.begin() + i);//
-        this->_pfds.erase(this->_pfds.begin() + i + 1);
-        close(fd);
-        std::cout << "~" << nickname << " has been disconnected" << std::endl;
+
+    // the recv call will return 0 or a negative value, indicating that the client has closed the connection.
+    else if (receivedBytes <= 0) {
+        handleDisconnection(i);
     }
     else if (receivedBytes > 0) {
         buffer[receivedBytes] = '\0';
@@ -362,14 +371,13 @@ void    Server::AcceptMsg(int i) {
     }
 }
 
-//void    Server::listen
-
 void    Server::start() {
     std::cout << "Irc server Launched" << std::endl;
     this->setServerSocket();
     this->setServerAddrInfo();
     this->bindServerSocket();
 
+    /* Listening */
     if (listen(this->_serverSocketFd, SOMAXCONN) < 0) {
         throw std::runtime_error("ERROR: Failed to listen for connections: " + std::string(strerror(errno)));
     }
@@ -381,7 +389,9 @@ void    Server::start() {
         std::runtime_error("Error setting socket to non-blocking mode");
     }
 
-    while (1) {
+    /* Our server Loop */
+    while (1)
+    {
         if (poll(this->_pfds.data(), this->_pfds.size(), -1) < 0)
             throw std::runtime_error("poll failed, error monitoring sockets!");
         for (unsigned int i = 0; i < this->_pfds.size(); i++)
@@ -389,30 +399,16 @@ void    Server::start() {
             if (this->_pfds[i].revents == 0)
                 continue ;
             if (this->_pfds[i].revents == POLLIN && this->_pfds[i].fd == this->_serverSocketFd)
-                acceptConnection();
-            if (this->_pfds[i].revents == POLLIN && this->_pfds[i].fd != this->_serverSocketFd) {
-                AcceptMsg(i); //recvmsgs
-            }
-            if (this->_pfds[i].revents == 17 || this->_pfds[i].revents == POLLHUP)
-            // if (this->_pfds[i].revents & POLLHUP || this->_pfds[i].revents & POLLERR)
-            {
-                int fd;
-                fd = this->_pfds[i].fd;
-                delete this->_clientList[i - 1];
-                this->_clientList.erase(this->_clientList.begin() + i - 1);
-                this->_pfds.erase(this->_pfds.begin() + i);
-                close(fd);
-                std::cout << "Client disconnected" << std::endl;
-                // if (this->_fds[i].revents & (POLLHUP | POLLERR)) {
-                // handleDisconnect();
-            }
+                handleNewConnection();
+            if (this->_pfds[i].revents == POLLIN && this->_pfds[i].fd != this->_serverSocketFd)
+                AcceptMsg(i);
+            if (this->_pfds[i].revents & POLLHUP || this->_pfds[i].revents & POLLERR)
+                handleDisconnection(i);
         }
         // disconnect the client if the _keepAlive boolean is false 
-        for (unsigned int i = 0; i < this->_clientList.size(); i++)
-        {
-            if (this->_clientList[i]->_keepAlive) {
-                // handle_disconnection(i + 1);
-            }
+        for (unsigned int i = 0; i < this->_clientList.size(); i++) {
+            if (this->_clientList[i]->_keepAlive)
+                handleDisconnection(i);
         }
     }
 }
@@ -422,7 +418,7 @@ Server::Server(std::string port, std::string password) {
     if (this->_port == 0 || (this->_port < 0 || this->_port > 65535))
         throw std::runtime_error("Invalid port");
     this->_password = password;
-    if (!(this->_password.length() >= 8 && this->_password.length() <= 16)) // != Password || empty
+    if (!(this->_password.length() >= 8 && this->_password.length() <= 16))
         throw std::runtime_error("Invalid password");
 }
 

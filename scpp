@@ -14,7 +14,44 @@
 #include "../Include/Client.hpp"
 #include "../Include/Channel.hpp"
 
-void    Server::acceptConnection()
+//void    Server::listen
+
+// void    Server::handleDisconnection(int i) {
+//     int fd;
+//     fd = this->_pfds[i].fd;
+//     delete this->_clientList[i - 1];
+//     this->_clientList.erase(this->_clientList.begin() + i - 1);
+//     this->_pfds.erase(this->_pfds.begin() + i);
+//     close(fd);
+//     std::cout << "~" << "Client disconnected" << std::endl;
+// }
+
+
+//void    Server::listen
+
+// void    Server::handleDisconnection(int i) {
+//     int fd;
+//     fd = this->_pfds[i].fd;
+//     delete this->_clientList[i - 1];
+//     this->_clientList.erase(this->_clientList.begin() + i - 1);
+//     this->_pfds.erase(this->_pfds.begin() + i);
+//     close(fd);
+//     std::cout << "~" << "Client disconnected" << std::endl;
+// }
+
+void    Server::handleDisconnection(int i) {
+    int i = i - 1;
+    std::string nickname = this->_clientList[i]->_nickname;
+    int fd;
+    fd = this->_pfds[i + 1].fd;
+    delete this->_clientList[i];
+    this->_clientList.erase(this->_clientList.begin() + i);
+    this->_pfds.erase(this->_pfds.begin() + i + 1);
+    close(fd);
+    std::cout << "~" << nickname << " has been disconnected" << std::endl;
+}
+
+void    Server::handleNewConnection()
 {
     sockaddr_in clientAddr;
     socklen_t clientSize = sizeof(clientAddr);
@@ -372,18 +409,6 @@ void    Server::AcceptMsg(int i) {
     }
 }
 
-//void    Server::listen
-
-void    Server::handleDisconnection(int i) {
-    int fd;
-    fd = this->_pfds[i].fd;
-    delete this->_clientList[i - 1];
-    this->_clientList.erase(this->_clientList.begin() + i - 1);
-    this->_pfds.erase(this->_pfds.begin() + i);
-    close(fd);
-    std::cout << "~" << "Client disconnected" << std::endl;
-}
-
 void    Server::start() {
     std::cout << "Irc server Launched" << std::endl;
     this->setServerSocket();
@@ -412,7 +437,7 @@ void    Server::start() {
             if (this->_pfds[i].revents == 0)
                 continue ;
             if (this->_pfds[i].revents == POLLIN && this->_pfds[i].fd == this->_serverSocketFd)
-                acceptConnection();
+                handleNew();
             if (this->_pfds[i].revents == POLLIN && this->_pfds[i].fd != this->_serverSocketFd) {
                 AcceptMsg(i);
             }
