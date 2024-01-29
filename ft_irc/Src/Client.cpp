@@ -35,13 +35,15 @@
 //     // (void)clientFD; // Not needed as you are already using it in the initializer list
 // }
 
-Client::Client(int &clientFD) : 
+Client::Client(int &clientFD) :
+    _clientFd(clientFD),
+    _userMode("0"),
+    _authenticated(0),
+    _welcomed(0),
+    _registred(0),
     _keepAlive(1)
-    //_registred(0),
-    //_authenticated(0),
-    //_welcomed(0)
-    {
-        this->_clientFd = clientFD;
+{
+    /**/
 }
 
 Client::~Client() {
@@ -52,18 +54,10 @@ Client::~Client() {
 
 // host port password nickname
 // your host is oelhoum.1337,
-// this server ha been started Wed Oct 12 2022
-// There are 1 users and 1 bot on 1 servers
+// Bot: There are 1 users and 1 bot on 1 servers
 // end of MOTD command
-// nc localhost 1337
-// PASS IRC-1337
-// NICK TOOWAN
-// 464: Password Incorrect
 
 /*
-MAX_BUFFER_SIZE
-buffer[MAX_BUFFER_SIZE]
-
 /exit
 /quit
 

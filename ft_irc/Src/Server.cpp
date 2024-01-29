@@ -129,21 +129,8 @@ void    Server::parse_cmd(std::string line, int i) {
     if (startsWith(line, "connect") || startsWith(line, "CONNECT")) {
         //std::cout << "yes> " << line << std::endl;
     }
-    else if (startsWith(line, "pass") || startsWith(line, "PASS")) {
-        int args = countArguments(line);
-        if (args > 1)
-        {
-            std::string cmd = "pass";
-            int start = cmd.length() + 1;
-            this->_clientList[i]->_authenticated = false; // dirha f init <defConstructor>
-            this->_clientList[i]->_password = line.substr(start);
-            //if (this->_clientList[i]->_password.compare(Server::_password) == 0)
-            if (this->_clientList[i]->_password.compare(Server::_password) == 0)
-            {
-                this->_clientList[i]->_authenticated = true;
-            }
-        }
-    }
+    else if (startsWith(line, "pass") || startsWith(line, "PASS"))
+        Pass(line, i);
     else if (startsWith(line, "server") || startsWith(line, "SERVER")) {
         /**/
     }

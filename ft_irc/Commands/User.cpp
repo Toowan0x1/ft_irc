@@ -34,16 +34,25 @@ void    sendMsg(int fd, std::string msg)
     }
 }
 
-
-struct IsAlpha {
-    bool operator()(char c) const {
-        return std::isalpha(c);
+bool isValidString(const std::string& str) {
+    for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+        char c = *it;
+        if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ' ')) {
+            return false;  // Character is not a letter or space
+        }
     }
-};
-
-bool isOnlyLetters(const std::string& str) {
-    return std::all_of(str.begin(), str.end(), IsAlpha());
+    return true;  // All characters are valid
 }
+
+// bool isValidString(const std::string& str)
+// {
+//     for (char c : str) {
+//         if (!(std::isalpha(c) || c == ' ' || c == '\t' || c == '\v')) {
+//             return false;  // Character is not a letter or space
+//         }
+//     }
+//     return true;  // All characters are valid
+// }
 
 // Example: /user <username> <usermode> * :<realname>
 void    Server::User(std::string line, int i)
@@ -86,6 +95,8 @@ void    Server::User(std::string line, int i)
                 || usermode[0] == 'a' || usermode[0] == 'r'))
         {
                 this->_clientList[i]->_userMode = usermode;
+                std::string msg = "Usermode set to: " + usermode + "\n";
+                sendMsg(_clientList[i]->_clientFd, msg);
         }
         else {
             sendMsg(this->_clientList[i]->_clientFd,"Invalid mode. Please enter one of the valid modes (i, o, w, a, r).\n");
@@ -103,14 +114,26 @@ void    Server::User(std::string line, int i)
             k++;
         }
         if (res == 0)
+        {
             this->_clientList[i]->_username = username;
+            std::string msg = "Username set to: " + username + "\n";
+            sendMsg(_clientList[i]->_clientFd, msg);
+        }
         else {
-            std::string msg = "@" + username + " username is registred. Please choose a different username.\n";
-            sendMsg(this->_clientList[i]->_clientFd, msg);
+            if (this->_clientList[i]->_username != username)
+            {
+                std::string msg = "@" + username + " username is registred. Please choose a different username.\n";
+                sendMsg(this->_clientList[i]->_clientFd, msg);
+            }
+            else
+            { // anounce user that username set to ....
+                std::string msg = "Username set to: " + username + "\n";
+                sendMsg(_clientList[i]->_clientFd, msg);
+            }
         }
 
         // check realname:
-        if (realname.length() >= 35 && isOnlyLetters(realname))
+        if (realname.length() >= 35 || isValidString(realname) == 0)
         {
             std::string msg = "Invalid realname. Please ensure it has at most 35 characters and contains only letters.\n"; ///
             sendMsg(this->_clientList[i]->_clientFd, msg);
@@ -118,12 +141,9 @@ void    Server::User(std::string line, int i)
         else
         {
             this->_clientList[i]->_realName = realname;
-            std::cout << "Real name set to: " << realname << std::endl;
+            std::string msg = "Realname set to: " + realname + "\n";
+            sendMsg(_clientList[i]->_clientFd, msg);
         }
-
-        //this->_clientList[i]->_username = username;
-        //this->_clientList[i]->_userMode = usermode;
-        //this->_clientList[i]->_realName = realname;
     }
 }
 

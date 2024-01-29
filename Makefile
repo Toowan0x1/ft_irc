@@ -20,6 +20,7 @@ SRC :=	ft_irc/main.cpp		\
 		ft_irc/Src/Client.cpp	\
 		ft_irc/Src/Channel.cpp \
 		ft_irc/Commands/User.cpp \
+		ft_irc/Commands/Pass.cpp \
 		
 
 # Generate the list of object files based on source files
