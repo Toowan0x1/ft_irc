@@ -41,16 +41,21 @@ Some extra features to be added into IRC server so it looks even more like and a
 
 IRC (Internet Relay Chat) clients are applications that facilitate communication on the IRC network, allowing users to connect, chat, and participate in discussions with other users around the world. Whether you prefer a command-line interface or a graphical user interface, there are various IRC clients to suit your preferences.
 
-- [irssi]()
-- [weechat]()
-- [xchat]()
-- [hexchat]()
-- [konversation]()
+- [irssi](https://irssi.org/download/)
+- [weechat](https://weechat.org/)
+- [xchat](http://xchat.org/)
+- [hexchat](https://hexchat.github.io/downloads.html)
+- [konversation](https://konversation.kde.org/)
 
 <img src="https://raw.githubusercontent.com/Toowan0x1/ft_irc/master/Screenshot%20from%202024-01-30%2006-26-25.png">
 
 #### Choosing an IRC Client
 - Selecting an IRC client depends on your preferences and requirements. Whether you favor a command-line environment, a user-friendly GUI, or specific features, there's an IRC client suitable for you. Explore the options and find the client that aligns with your communication style and workflow.
+
+## Lessons
+- Socket programming & multiplixing
+- poll error monitor and handling
+- event-driven programming
 
 ## Supported Commands
 - [x] USER
@@ -67,7 +72,3 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 - [ ] TOPIC
 - [ ] MODE
 
-## Lessons
-- Socket programming & multiplixing
-- poll error monitor and handling
-- event-driven programming
