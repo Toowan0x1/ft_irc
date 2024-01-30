@@ -25,7 +25,7 @@ static int     countArguments(std::string line) {
     return (count);
 }
 
-void    sendMsg(int fd, std::string msg)
+static void    sendMsg(int fd, std::string msg)
 {
     const char *msssg = msg.c_str();
     size_t msgSize = strlen(msssg);
@@ -35,6 +35,12 @@ void    sendMsg(int fd, std::string msg)
 }
 
 bool isValidString(const std::string& str) {
+    // Check if the first character is a colon
+    if (!str.empty() && str[0] == ':') {
+        return true;  // Valid, don't perform further checks
+    }
+
+    // Check the remaining characters
     for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
         char c = *it;
         if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ' ')) {

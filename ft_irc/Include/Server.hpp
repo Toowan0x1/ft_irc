@@ -55,6 +55,8 @@ class Server {
         void    parse_cmd(std::string, int i);//int i
         void    User(std::string line, int clientFd);
         void    Pass(std::string line, int clientFd);
+        void    Nick(std::string line, int clientFd);
+        void    Quit(std::string line, int clientFd);
         
         bool    startsWith(const std::string&, const std::string&);
         ~Server();
@@ -66,5 +68,6 @@ class Server {
 // serverPfd
 // fcntl
 // gns3
+// packet tracer tb
 
 #endif

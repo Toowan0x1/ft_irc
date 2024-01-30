@@ -6,7 +6,7 @@
 /*   By: oel-houm <oel-houm@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 13:27:00 by oel-houm          #+#    #+#             */
-/*   Updated: 2024/01/18 13:27:01 by oel-houm         ###   ########.fr       */
+/*   Updated: 2024/01/29 18:03:57 by oel-houm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "../Include/Channel.hpp"
 
 void    Server::handleDisconnection(int i) {
-    i = i - 1; // because i = 1 and the index of clients starts from 0
+    i = i - 1;
     std::string nickname = this->_clientList[i]->_nickname;
     int fd;
     fd = this->_pfds[i + 1].fd;
@@ -37,11 +37,9 @@ void    Server::handleNewConnection()
     
     if (fcntl(clientSocketFd, F_SETFL, O_NONBLOCK) == -1)
         throw std::runtime_error("Error setting client socket to non-blocking mode!");
-    /*
-    int sa = getnameinfo((sockaddr*)&client, sizeof(client), hbuf, sizeof(hbuf), sbuf, sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV);
-    if (sa == 0)
-        std::cout << "Accepted connection on descriptor " << clientSocket << "(host=" << hbuf << ", port=" << sbuf << ")" << std::endl;
-    */
+    //int sa = getnameinfo((sockaddr*)&client, sizeof(client), hbuf, sizeof(hbuf), sbuf, sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV);
+    // if (sa == 0)
+        // std::cout << "Accepted connection on descriptor " << clientSocket << "(host=" << hbuf << ", port=" << sbuf << ")" << std::endl;
     pollfd pfd;
     pfd.fd = clientSocketFd;
     pfd.events = POLLIN;
@@ -94,6 +92,18 @@ void    Server::bindServerSocket()
     }
 }
 
+std::vector<std::string> split(const std::string &s, char delimiter) {
+    std::vector<std::string> tokens;
+    std::istringstream ss(s);
+    std::string token;
+
+    while (std::getline(ss, token, delimiter)) {
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+
 bool    Server::startsWith(const std::string &str, const std::string &target)
 {
     size_t spacePos = str.find(' '); // "        cmd    " spaces before the cmd!
@@ -110,10 +120,10 @@ std::size_t     findFirstSpecialChar(std::string str) {
     return std::string::npos;
 }
 
-int     countArguments(std::string line) { // countCommandArgs
+int     countArguments(std::string line) {
     std::istringstream iss(line);
     std::string word;
-    int count = 0;
+    int count;
 
     while (iss >> word)
         count++;
@@ -126,16 +136,66 @@ void    Server::parse_cmd(std::string line, int i) {
     // this->_clientList[i]->_buffer = line;
     // std::cout << 0 << ":" << _clientList[i]->_buffer << std::endl;
     // std::cout << "%" << line << "%" << std::endl;
-    // if (startsWith(line, "connect") || startsWith(line, "CONNECT")) {
-    //     //std::cout << "yes> " << line << std::endl;
-    // }
-    // else if (startsWith(line, "server") || startsWith(line, "SERVER")) {
-    //     /**/
-    // }
-    if (startsWith(line, "pass") || startsWith(line, "PASS"))
-        Pass(line, i);
-    else if (startsWith(line, "nick") || startsWith(line, "NICK"))
-        Nick(line, i);
+    if (startsWith(line, "connect") || startsWith(line, "CONNECT")) {
+        //std::cout << "yes> " << line << std::endl;
+    }
+    else if (startsWith(line, "pass") || startsWith(line, "PASS")) {
+        int args = countArguments(line);
+        if (args > 1)
+        {
+            std::string cmd = "pass";
+            int start = cmd.length() + 1;
+            this->_clientList[i]->_authenticated = false; // dirha f init <defConstructor>
+            this->_clientList[i]->_password = line.substr(start);
+            //if (this->_clientList[i]->_password.compare(Server::_password) == 0)
+            if (this->_clientList[i]->_password.compare(Server::_password) == 0)
+            {
+                this->_clientList[i]->_authenticated = true;
+            }
+        }
+    }
+    else if (startsWith(line, "server") || startsWith(line, "SERVER")) {
+        /**/
+    }
+    else if (startsWith(line, "nick") || startsWith(line, "NICK")) {
+        int args = countArguments(line);
+        if (args > 1) {
+            /* n7ydo hadchi li hna o ndiro istringstream */
+            // std::string cmd = "nick";
+            // int start = cmd.length() + 1;
+            // int end = findFirstSpecialChar(line.substr(start));
+            // this->_clientList[i]->_nickname = line.substr(start, end);
+            
+            // check if nick args provided more than 2 wla hexchat behavior works in another way (test it before implement)
+
+            std::istringstream iss(line);
+            size_t t = 0;
+            std::string arg1, arg2;
+            while (iss && t < 2) {
+                if (t == 0)
+                    iss >> arg1;
+                if (t == 1)
+                    iss >> arg2;
+                t++;
+            }
+            t = 0;
+            bool isDuplicated = false;
+            while (t < this->_clientList.size()) {
+                if (this->_clientList[t]->_nickname == arg2) {
+                    isDuplicated = true;
+                    // print ~nickname <nick>
+                    const char *msg = "This nickname is registred. Please choose a different nickname.\n";
+                    if (send(this->_clientList[i]->_clientFd, msg, strlen(msg), 0) < 0) {
+                        std::cout << "Send failed!" << std::endl;
+                    }
+                    break ;
+                }
+                t++;
+            }
+            if (isDuplicated != true)
+                this->_clientList[i]->_nickname = arg2;
+        }
+    }
     else if (startsWith(line, "user") || startsWith(line, "USER")) {
         User(line, i);
     }
@@ -186,7 +246,28 @@ void    Server::parse_cmd(std::string line, int i) {
         }
     }
     else if (startsWith(line, "quit") || startsWith(line, "QUIT"))
-        Quit(line, i);
+    {
+        int args = countArguments(line);
+        if (args > 1) {
+            std::string cmd = "quit";
+            int start = cmd.length() + 1;
+            this->_clientList[i]->_leaveMsg = ":";
+            this->_clientList[i]->_leaveMsg += line.substr(start);
+            // handle disconnect
+        }
+        else {
+            this->_clientList[i]->_leaveMsg = ":Leaving the server";
+            // handle disconnect
+            std::string nickname = this->_clientList[i]->_nickname;
+            int fd;
+            fd = this->_pfds[i+1].fd;
+            delete this->_clientList[i];//
+            this->_clientList.erase(this->_clientList.begin() + i);//
+            this->_pfds.erase(this->_pfds.begin() + i + 1);
+            close(fd);
+            std::cout << "~" << nickname << " has been disconnected" << std::endl;
+        }
+    }
     else if (startsWith(line, "whois") || startsWith(line, "WHOIS"))
     {
         if (this->_clientList[i]->_authenticated == false) {
@@ -326,7 +407,7 @@ void    Server::start() {
         }
         // disconnect the client if the _keepAlive boolean is false 
         for (unsigned int i = 0; i < this->_clientList.size(); i++) {
-            if (this->_clientList[i]->_keepAlive == 0)
+            if (this->_clientList[i]->_keepAlive)
                 handleDisconnection(i);
         }
     }
@@ -368,20 +449,3 @@ Server::~Server() {
 
 // TO DO:
 // when someone change his nickname inform all the channel members,
-
-
-
-
-/*
-std::vector<std::string> split(const std::string &s, char delimiter) {
-    std::vector<std::string> tokens;
-    std::istringstream ss(s);
-    std::string token;
-
-    while (std::getline(ss, token, delimiter)) {
-        tokens.push_back(token);
-    }
-
-    return tokens;
-}
-*/
