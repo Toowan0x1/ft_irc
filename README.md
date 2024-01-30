@@ -41,6 +41,14 @@ Some extra features to be added into IRC server so it looks even more like and a
 - poll error monitor and handling
 - event-driven programming
 
+## IRC CLients
+<img src="https://raw.githubusercontent.com/Toowan0x1/ft_irc/master/Screenshot%20from%202024-01-30%2006-26-25.png">
+- irssi
+- weechat
+- hexchat
+- xchat
+- konversation
+
 ## Supported Commands
 - [x] USER
 - [x] NICK
