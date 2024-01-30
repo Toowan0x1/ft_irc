@@ -52,7 +52,7 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 #### Choosing an IRC Client
 - Selecting an IRC client depends on your preferences and requirements. Whether you favor a command-line environment, a user-friendly GUI, or specific features, there's an IRC client suitable for you. Explore the options and find the client that aligns with your communication style and workflow.
 
-#### 🚨 Important Note
+#### Important Note
 - Our IRC program has been tested and is fully compatible with the HexChat IRC client. HexChat is used as our reference client during development and testing to ensure seamless compatibility and optimal performance.
 
 ## Lessons
