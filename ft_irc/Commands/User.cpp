@@ -153,3 +153,12 @@ void    Server::User(std::string line, int i)
     }
 }
 
+/*
+USER johnq * * :John Q. Hacker
+NICK johnq
+
+:irc.host.com NOTICE * :*** Looking up your hostname...
+:irc.host.com NOTICE * :*** Could not resolve your hostname: Domain not found; using your IP address () instead.
+
+CTRL+D
+*/

@@ -136,55 +136,10 @@ void    Server::parse_cmd(std::string line, int i) {
         Pass(line, i);
     else if (startsWith(line, "nick") || startsWith(line, "NICK"))
         Nick(line, i);
-    else if (startsWith(line, "user") || startsWith(line, "USER")) {
+    else if (startsWith(line, "user") || startsWith(line, "USER"))
         User(line, i);
-    }
-    else if (startsWith(line, "join") || startsWith(line, "JOIN")) {
-        /* banana */
-        /*
-        [client->server]
-        [client->server]:toowan@0 JOIN #seclab
-        */
-        /* #hackforums has been created! */
-        //check if authenticated and have nick, user, realname etc
-        // if user disconnected o dar connect next time, kaytra mochkil dyal double userNIckname
-        // 
-        int args = countArguments(line);
-        if (args > 1 && args == 2)
-        {
-            std::string arg1, arg2;
-            std::istringstream iss(line);
-            int k = 0;
-            while (iss && k < args)
-            {
-                if (k == 0)
-                    iss >> arg1;
-                if (k == 1)
-                    iss >> arg2;
-                k++;
-            }
-            // channel names MUST start with #
-            if (arg2[0] != '#') {
-                /**/
-            }
-            // Creating new channel
-            Channel *newChannel = new Channel(arg2);//arg2 channel
-            this->_channels.push_back(newChannel);
-            // add a user to channel members
-            newChannel->_members.push_back(this->_clientList[i]); // clientlist i + 1 -1 
-            /* inform everyone that user has joined
-                ...
-            */
-            if (send(this->_clientList[i]->_clientFd, "joined general\n", 16, 0) < 0)
-            {
-                //
-            }
-        }
-        else{
-            //("461 " + _nickName + " JOIN :Not enough parameters");
-            //std::cout << "" << std::endl;
-        }
-    }
+    else if (startsWith(line, "join") || startsWith(line, "JOIN"))
+        Join(line, i);
     else if (startsWith(line, "quit") || startsWith(line, "QUIT"))
         Quit(line, i);
     else if (startsWith(line, "whois") || startsWith(line, "WHOIS"))

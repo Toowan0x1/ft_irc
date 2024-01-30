@@ -46,11 +46,11 @@ Some extra features to be added into IRC server so it looks even more like and a
 - [x] NICK
 - [x] PASS
 - [x] JOIN
+- [x] WHO
+- [x] WHOIS
+- [ ] LIST
 - [ ] MSG
 - [ ] PRIVMSG
-- [ ] LIST
-- [x] WHO
-- [ ] WHOIS
 - [ ] KICK
 - [ ] INVITE
 - [ ] TOPIC

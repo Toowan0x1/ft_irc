@@ -46,11 +46,8 @@ void    Server::Quit(std::string line, int i) {
         // loop on all clients and anounce them that client x has been disconnected
         size_t j = 0;
         while (j < _clientList.size()) { // && _clientList[i]-> joined to #channel
-            //if (_clientList[j]->_authenticated == 1)
-            //{
+            if (_clientList[j]->_authenticated == 1)
                 sendMsg(_clientList[j]->_clientFd, msg);
-                sendMsg(_clientList[j]->_clientFd, "bfffffff1");
-            //}
             j++;
         }
     }
@@ -65,7 +62,6 @@ void    Server::Quit(std::string line, int i) {
         size_t j = 0;
         while (j < _clientList.size()) { // && _clientList[i]-> joined to #channel
             sendMsg(_clientList[j]->_clientFd, msg);
-            sendMsg(_clientList[j]->_clientFd, "bfffffff2");
             j++;
         }
     }
@@ -76,4 +72,11 @@ Notes:
 [client server]   if nickname "to the IRC Network, !"
 if empty then make a default one
  (add color green and red + )
+*/
+// page correction
+
+/*
+- [x] JOIN
+- [x] WHO
+- [x] WHOIS
 */
