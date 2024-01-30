@@ -42,13 +42,14 @@ Some extra features to be added into IRC server so it looks even more like and a
 - event-driven programming
 
 ## IRC CLients
-- irssi
-- weechat
-- xchat
-- hexchat
-- konversation
 
 <img src="https://raw.githubusercontent.com/Toowan0x1/ft_irc/master/Screenshot%20from%202024-01-30%2006-26-25.png">
+
+- [irssi]()
+- [weechat]()
+- [xchat]()
+- [hexchat]()
+- [konversation]()
 
 
 ## Supported Commands
