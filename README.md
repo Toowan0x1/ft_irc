@@ -36,10 +36,6 @@ Some extra features to be added into IRC server so it looks even more like and a
     ```sh
     /server <SERVER_IP> <SERVER_PORT> <SERVER_PASSWORD>
     ```
-## Lessons
-- Socket programming & multiplixing
-- poll error monitor and handling
-- event-driven programming
 
 ## Popular IRC CLients
 
@@ -70,3 +66,8 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 - [ ] INVITE
 - [ ] TOPIC
 - [ ] MODE
+
+## Lessons
+- Socket programming & multiplixing
+- poll error monitor and handling
+- event-driven programming
