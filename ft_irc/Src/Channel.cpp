@@ -16,8 +16,9 @@ Channel::Channel() {
     /**/
 }
 
-Channel::Channel(std::string channel) {
-    /**/ (void)channel;
+Channel::Channel(std::string channelName) : _name(channelName)
+{
+    /**/ //(void)channelName;
 }
 
 Channel::~Channel() {

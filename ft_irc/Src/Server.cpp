@@ -122,7 +122,7 @@ int     countArguments(std::string line) { // countCommandArgs
 
 void    Server::parse_cmd(std::string line, int i) {
     i = i - 1; // because i = 1 and the index of clients starts from 0
-    std::cout << "clientFd=" << i << std::endl;
+    //std::cout << "clientFd=" << i << std::endl;
     // this->_clientList[i]->_buffer = line;
     // std::cout << 0 << ":" << _clientList[i]->_buffer << std::endl;
     // std::cout << "%" << line << "%" << std::endl;
@@ -239,7 +239,7 @@ void    Server::AcceptMsg(int i) {
                     line.erase(ii, 1);
                 ii++;
             }
-            std::cout << "cmd: $" << line << "$" << std::endl;
+            //std::cout << "cmd: $" << line << "$" << std::endl;
             parse_cmd(line, i);
         }
     }
