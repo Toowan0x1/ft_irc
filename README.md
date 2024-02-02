@@ -75,3 +75,5 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 - [ ] TOPIC
 - [ ] MODE
 
+## Remarque :
+This project is under building, and not finished yet.
