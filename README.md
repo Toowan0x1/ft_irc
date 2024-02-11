@@ -47,7 +47,7 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 - [hexchat](https://hexchat.github.io/downloads.html)
 - [konversation](https://konversation.kde.org/)
 
-<img src="https://raw.githubusercontent.com/Toowan0x1/ft_irc/master/Screenshot%20from%202024-01-30%2006-26-25.png">
+<img src="https://raw.githubusercontent.com/Toowan0x1/ft_irc/master/Assets/Screenshot%20from%202024-01-30%2006-26-25.png">
 
 #### Choosing an IRC Client
 - Selecting an IRC client depends on your preferences and requirements. Whether you favor a command-line environment, a user-friendly GUI, or specific features, there's an IRC client suitable for you. Explore the options and find the client that aligns with your communication style and workflow.
