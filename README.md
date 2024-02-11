@@ -75,5 +75,8 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 - [ ] TOPIC
 - [ ] MODE
 
+## User Modes
+- https://libera.chat/guides/usermodes
+
 ## Remarque :
 This project is under building, and not finished yet.
