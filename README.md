@@ -78,8 +78,10 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 ## User Modes
 - https://libera.chat/guides/usermodes
 
-## In case you start the irc server as root:
+## Warning
+In case you start the irc server as root:
 - Running ircserv as root is generally not required and may allow an attacker to gain access to your system if they find a way to exploit your IRC server.
+<img src="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F8717181c-3298-456a-ab38-4cda8a4986de%2F928b451e-1e3a-4123-acd0-fe1bb3526b6f%2FUntitled.png?table=block&id=aadb7ab1-8336-491f-8187-dbbd88ac7867&spaceId=8717181c-3298-456a-ab38-4cda8a4986de&width=2000&userId=57f6b88f-ef50-43ed-abb8-00731e19a837&cache=v2">
 
 ## Remarque :
 This project is under building, and not finished yet.
