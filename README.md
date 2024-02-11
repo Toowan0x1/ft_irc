@@ -78,5 +78,8 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 ## User Modes
 - https://libera.chat/guides/usermodes
 
+## In case you start the irc server as root:
+- Running ircserv as root is generally not required and may allow an attacker to gain access to your system if they find a way to exploit your IRC server.
+
 ## Remarque :
 This project is under building, and not finished yet.
