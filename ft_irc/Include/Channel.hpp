@@ -24,7 +24,7 @@ class   Channel {
     public:
         std::string _name;
         std::string _pass;
-        bool    hasPassword = 0;
+        bool    hasPassword;
         std::vector<Client *> _members;
         Channel();
         Channel(std::string channel);

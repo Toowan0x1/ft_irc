@@ -53,8 +53,7 @@ void    Server::Join(std::string line, int i) {
 
         // check if the user authenticated with valid pass, have user and nick
         {
-            int flag = 0;
-            if (_clientList[i]->_authenticated == false) // registred
+            if (_clientList[i]->_authenticated == false)
             {
                 std::string ss, sr;
                 if (_clientList[i]->_nickname.empty())
@@ -69,8 +68,6 @@ void    Server::Join(std::string line, int i) {
                 }
                 sendMsg(_clientList[i]->_clientFd, ss);
                 sendMsg(_clientList[i]->_clientFd, sr);
-
-                flag = 1;
             }
             if (_clientList[i]->_username.empty())
             {
@@ -82,8 +79,6 @@ void    Server::Join(std::string line, int i) {
                 else
                 sr = this->_hostname + " NOTICE " + _clientList[i]->_nickname + " NOTICE * :Please set a username, mode, and realname before joining channels.\n";
                 sendMsg(_clientList[i]->_clientFd, sr);
-
-                flag = 1;
             }
             if (_clientList[i]->_nickname.empty())
             {
@@ -95,18 +90,6 @@ void    Server::Join(std::string line, int i) {
                 else
                     sr = this->_hostname + " NOTICE " + _clientList[i]->_nickname + " :Please set a nickname using the /NICK command before joining channels.\n";
                 sendMsg(_clientList[i]->_clientFd, sr);
-
-                flag = 1;
-            }
-            if (flag == 1)
-            {
-                std::string ss;
-                if (_clientList[i]->_nickname.empty())
-                    ss = this->_hostname + " 475 * " + channelName + " :Cannot join channel (+k)\n";
-                else
-                    ss = this->_hostname + " 475 " + _clientList[i]->_nickname + " " + channelName + " :Cannot join channel (+k)\n";
-                sendMsg(_clientList[i]->_clientFd, ss);
-                return;
             }
         }
 
@@ -126,6 +109,25 @@ void    Server::Join(std::string line, int i) {
             // in case the channel already exists
             if (joinedChannel != NULL)
             {
+                // check hasPass
+                if (joinedChannel->hasPassword == 1)
+                {
+                    if (joinedChannel->_pass != channelPass)
+                    {
+                        std::string message;
+                        if (channelPass.empty())
+                        {
+                            message = _hostname + " NOTICE * :The channel " + channelName + " requires a password to join.\n";
+                            sendMsg(_clientList[i]->_clientFd, message);
+                        }
+                        else if (!channelPass.empty() && joinedChannel->_pass != channelPass)
+                        {
+                            message = this->_hostname + " 475 " + _clientList[i]->_nickname + " " + channelName + " :Cannot join channel (+k)\n";
+                            sendMsg(_clientList[i]->_clientFd, message);
+                        }
+                        return;
+                    }
+                }
                 // check if user doesnt belongs to the channel if no pushback him
                 int userJoined = 0; // ///// // // change this
                 std::vector<Client *>::iterator iter;
