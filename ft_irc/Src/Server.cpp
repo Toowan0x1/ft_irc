@@ -50,8 +50,14 @@ void    Server::handleNewConnection()
 
     Client *my_client = new Client(clientSocketFd);
     my_client->_IPAddress = inet_ntoa(clientAddr.sin_addr);
+    /* make this peice of code in single function */
+    char hostbuffer[256];
+    int hostname = gethostname(hostbuffer, sizeof(hostbuffer));
+    if (hostname != -1)
+        my_client->_hostname = hostbuffer;
+    /* == == == == == == == == == == == == == == */
     this->_clientList.push_back(my_client);
-    std::cout << "[+] New Client Connected, Client IP Address " << my_client->_IPAddress << std::endl;
+    std::cout << "[+] New Client Connected, (IP=" << my_client->_IPAddress << ", HOST=" << my_client->_hostname << ")" << std::endl;
 }
 
 void    Server::setServerSocket()

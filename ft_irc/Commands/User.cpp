@@ -95,6 +95,13 @@ void    Server::User(std::string line, int i)
             j++;
         }
 
+        // check hostname placeholder
+        if (!hostname.empty())
+        {
+            std::string msg = "hostname (" + hostname + ") set to: " + this->_clientList[i]->_hostname + "\n";
+            sendMsg(_clientList[i]->_clientFd, msg);
+        }
+
         // check usermodes:
         if (usermode.length() == 1 && (usermode[0] == '0' || usermode[0] == 'i'
                 || usermode[0] == 'o' || usermode[0] == 'w'

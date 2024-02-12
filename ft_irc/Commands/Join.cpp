@@ -51,6 +51,19 @@ void    Server::Join(std::string line, int i) {
             k++;
         }
 
+        // ability to join just 1 channel
+        {
+            if (_clientList[i]->_joined == true)
+            {
+                std::string message;
+                message = _hostname + " NOTICE " + _clientList[i]->_nickname + " You are already in a channel. You cannot join another one.\n";
+                sendMsg(_clientList[i]->_clientFd, message);
+                message = _hostname + " NOTICE " + _clientList[i]->_nickname + " Leave this channel in order to join another one.\n";
+                sendMsg(_clientList[i]->_clientFd, message);
+                return;
+            }
+        }
+
         // check if the user authenticated with valid pass, have user and nick
         {
             if (_clientList[i]->_authenticated == false)
@@ -59,12 +72,12 @@ void    Server::Join(std::string line, int i) {
                 if (_clientList[i]->_nickname.empty())
                 {
                     ss = this->_hostname + " 451 * :You have not registred\n";
-                    sr = this->_hostname + "NOTICE * :Please enter your IRC server password using the /PASS command before joining channels.\n";
+                    sr = this->_hostname + " NOTICE * :Please enter your IRC server password using the /PASS command before joining channels.\n";
                 }
                 else
                 {
                     ss = this->_hostname + " 451 " + _clientList[i]->_nickname + " :You have not registred\n";
-                    sr = this->_hostname + "NOTICE " + _clientList[i]->_nickname + " :Please enter your IRC server password using the /PASS command before joining channels.\n";
+                    sr = this->_hostname + " NOTICE " + _clientList[i]->_nickname + " :Please enter your IRC server password using the /PASS command before joining channels.\n";
                 }
                 sendMsg(_clientList[i]->_clientFd, ss);
                 sendMsg(_clientList[i]->_clientFd, sr);
@@ -91,6 +104,7 @@ void    Server::Join(std::string line, int i) {
                     sr = this->_hostname + " NOTICE " + _clientList[i]->_nickname + " :Please set a nickname using the /NICK command before joining channels.\n";
                 sendMsg(_clientList[i]->_clientFd, sr);
             }
+            return;
         }
 
         // channel names MUST start with #
@@ -140,6 +154,7 @@ void    Server::Join(std::string line, int i) {
                 if (userJoined == 0)
                 {
                     joinedChannel->_members.push_back(_clientList[i]);
+                    _clientList[i]->_joined = true;
                     std::cout << "~" << _clientList[i]->_nickname << " has been joined " << channelName << std::endl;
 
                     std::string tmp = _hostname + " 001 " + _clientList[i]->_nickname + " :Welcome to the channel! Enjoy your stay.\n";
@@ -162,6 +177,7 @@ void    Server::Join(std::string line, int i) {
                 /* Creating new channel */
                 Channel *newChannel = new Channel(channelName);
                 this->_channels.push_back(newChannel);
+                _clientList[i]->_joined = true;
                 if (!channelPass.empty())
                 {
                     newChannel->hasPassword = 1;
@@ -195,15 +211,11 @@ void    Server::Join(std::string line, int i) {
 }
 
 /*
-check if user have (nickname, username, authenticated with valid pass)
-// manage channel password (if channel have password / ask new users for pass?)
 // msg #channel msg
 // msg ~nickname msg
 // quit or exit a channel (quit :Leaving)
-
 -------
     banana
-    
     [client->server]
     [client->server]:toowan@0 JOIN #seclab
     // if user disconnected o dar connect next time, kaytra mochkil dyal double userNIckname

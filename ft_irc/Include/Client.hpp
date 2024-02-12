@@ -27,11 +27,11 @@ class   Client {
         std::string _realName;
         std::string _userMode;
         std::string _IPAddress;
+        std::string _hostname;
         std::string _password;
         std::string _buffer; // _msgBuffer  + leave_msg
-        bool _authenticated; //authorized // authorized means client entered correct password (only)
-        bool _welcomed; // welcomed means this used was registered before and welcomed, used so that we dont send welcome messages everytime user changes nick
-        bool _registred; // registered means client entered correct password, a valid nickname, username and realname 
+        bool _authenticated;
+        bool _joined;
         bool _keepAlive;
 
         std::string _leaveMsg;
