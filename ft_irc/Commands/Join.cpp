@@ -104,7 +104,8 @@ void    Server::Join(std::string line, int i) {
                     sr = this->_hostname + " NOTICE " + _clientList[i]->_nickname + " :Please set a nickname using the /NICK command before joining channels.\n";
                 sendMsg(_clientList[i]->_clientFd, sr);
             }
-            return;
+            // if chi l3ba then return;
+            //return;
         }
 
         // channel names MUST start with #

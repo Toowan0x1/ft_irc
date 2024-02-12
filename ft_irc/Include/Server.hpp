@@ -58,6 +58,7 @@ class Server {
         void    Nick(std::string line, int clientFd);
         void    Quit(std::string line, int clientFd);
         void    Join(std::string line, int clientFd);
+        void    List(std::string line, int clientFd);
         
         bool    startsWith(const std::string&, const std::string&);
         ~Server();

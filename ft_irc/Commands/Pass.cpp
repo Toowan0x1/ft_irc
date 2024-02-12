@@ -59,13 +59,3 @@ void    Server::Pass(std::string line, int i)
         }
     }
 }
-
-/*
-
-// Valid Password
-:irc.example.com 001 username :Welcome to the IRC Network, username!
-
-// Invalid Password
-:irc.example.com 464 * :Password incorrect
-
-*/

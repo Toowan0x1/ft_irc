@@ -148,6 +148,8 @@ void    Server::parse_cmd(std::string line, int i) {
         Join(line, i);
     else if (startsWith(line, "quit") || startsWith(line, "QUIT"))
         Quit(line, i);
+    else if (startsWith(line, "list") || startsWith(line, "LIST"))
+        List(line, i);
     else if (startsWith(line, "whois") || startsWith(line, "WHOIS"))
     {
         if (this->_clientList[i]->_authenticated == false) {

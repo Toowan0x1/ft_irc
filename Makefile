@@ -24,6 +24,7 @@ SRC :=	ft_irc/main.cpp		\
 		ft_irc/Commands/Nick.cpp \
 		ft_irc/Commands/Quit.cpp \
 		ft_irc/Commands/Join.cpp \
+		ft_irc/Commands/List.cpp \
 		
 
 # Generate the list of object files based on source files

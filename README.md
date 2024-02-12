@@ -6,7 +6,8 @@ Internet Relay Chat (IRC) is a text-based chat system for instant messaging. IRC
 
 Internet Relay Chat is implemented as an application layer protocol to facilitate communication in the form of text. The chat process works on a client–server networking model. Users connect, using a client—which may be a web app, a standalone desktop program, or embedded into part of a larger program—to an IRC server, which may be part of a larger IRC network. Examples of programs used to connect include Mibbit, IRCCloud, KiwiIRC, and mIRC.
 
-<img src="https://media.forgecdn.net/attachments/33/680/ircbridgescreenshot.png">
+<! <img src="https://media.forgecdn.net/attachments/33/680/ircbridgescreenshot.png"> -->
+<img src="https://i.redd.it/nsodxt2h967a1.jpg">
 
 ## Mandatory Part
 
@@ -67,7 +68,7 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 - [x] JOIN
 - [x] WHO
 - [x] WHOIS
-- [ ] LIST
+- [x] LIST
 - [ ] MSG
 - [ ] PRIVMSG
 - [ ] KICK
@@ -81,7 +82,7 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 ## Warning
 In case you start the irc server as root:
 - Running ircserv as root is generally not required and may allow an attacker to gain access to your system if they find a way to exploit your IRC server.
-<img src="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F8717181c-3298-456a-ab38-4cda8a4986de%2F928b451e-1e3a-4123-acd0-fe1bb3526b6f%2FUntitled.png?table=block&id=aadb7ab1-8336-491f-8187-dbbd88ac7867&spaceId=8717181c-3298-456a-ab38-4cda8a4986de&width=2000&userId=57f6b88f-ef50-43ed-abb8-00731e19a837&cache=v2">
+<img src="">
 
 ## Remarque :
 This project is under building, and not finished yet.
