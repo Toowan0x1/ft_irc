@@ -7,8 +7,8 @@ Internet Relay Chat (IRC) is a text-based chat system for instant messaging. IRC
 Internet Relay Chat is implemented as an application layer protocol to facilitate communication in the form of text. The chat process works on a client–server networking model. Users connect, using a client—which may be a web app, a standalone desktop program, or embedded into part of a larger program—to an IRC server, which may be part of a larger IRC network. Examples of programs used to connect include Mibbit, IRCCloud, KiwiIRC, and mIRC.
 
 <!-- <img src="https://media.forgecdn.net/attachments/33/680/ircbridgescreenshot.png"> -->
-<img src="https://i.redd.it/nsodxt2h967a1.jpg">
 <img src="https://raw.githubusercontent.com/Toowan0x1/ft_irc/master/Assets/chatserver.png">
+<img src="https://i.redd.it/nsodxt2h967a1.jpg">
 
 ## Mandatory Part
 
