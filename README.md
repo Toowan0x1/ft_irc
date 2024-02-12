@@ -8,7 +8,7 @@ Internet Relay Chat is implemented as an application layer protocol to facilitat
 
 <!-- <img src="https://media.forgecdn.net/attachments/33/680/ircbridgescreenshot.png"> -->
 <img src="https://raw.githubusercontent.com/Toowan0x1/ft_irc/master/Assets/chatserver.png">
-<img src="https://i.redd.it/nsodxt2h967a1.jpg">
+<!-- <img src="https://i.redd.it/nsodxt2h967a1.jpg"> -->
 
 ## Mandatory Part
 
