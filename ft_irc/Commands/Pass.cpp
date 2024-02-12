@@ -44,8 +44,12 @@ void    Server::Pass(std::string line, int i)
         this->_clientList[i]->_password = line.substr(start);
         if (this->_clientList[i]->_password.compare(Server::_password) == 0)
         {
+            std::string msg;
             this->_clientList[i]->_authenticated = true;
-            std::string msg = ":" + this->_hostname + " 001 " + this->_clientList[i]->_username + " :Welcome to the IRC Network, " + this->_clientList[i]->_username + "!\n";
+            //if (_clientList[i]->_username.empty())
+               // msg = ":" + this->_hostname + " 001 " + this->_clientList[i]->_username + " :Welcome to the IRC Network, " + this->_clientList[i]->_username + "!\n";
+            //else
+                msg = ":" + this->_hostname + " 001 " + this->_clientList[i]->_username + " :Welcome to the IRC Network, " + this->_clientList[i]->_username + "!\n";
             sendMsg(_clientList[i]->_clientFd, msg);
         }
         else

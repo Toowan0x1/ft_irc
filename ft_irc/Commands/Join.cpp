@@ -50,11 +50,71 @@ void    Server::Join(std::string line, int i) {
                 iss >> channelPass;
             k++;
         }
+
+        // check if the user authenticated with valid pass, have user and nick
+        {
+            int flag = 0;
+            if (_clientList[i]->_authenticated == false) // registred
+            {
+                std::string ss, sr;
+                if (_clientList[i]->_nickname.empty())
+                {
+                    ss = this->_hostname + " 451 * :You have not registred\n";
+                    sr = this->_hostname + "NOTICE * :Please enter your IRC server password using the /PASS command before joining channels.\n";
+                }
+                else
+                {
+                    ss = this->_hostname + " 451 " + _clientList[i]->_nickname + " :You have not registred\n";
+                    sr = this->_hostname + "NOTICE " + _clientList[i]->_nickname + " :Please enter your IRC server password using the /PASS command before joining channels.\n";
+                }
+                sendMsg(_clientList[i]->_clientFd, ss);
+                sendMsg(_clientList[i]->_clientFd, sr);
+
+                flag = 1;
+            }
+            if (_clientList[i]->_username.empty())
+            {
+                std::string ss, sr;
+                ss = this->_hostname + " 432 * :Erroneous nickname\n";
+                sendMsg(_clientList[i]->_clientFd, ss);
+                if (_clientList[i]->_username.empty())
+                    sr = this->_hostname + " NOTICE * :Please set a username, mode, and realname before joining channels.\n";
+                else
+                sr = this->_hostname + " NOTICE " + _clientList[i]->_nickname + " NOTICE * :Please set a username, mode, and realname before joining channels.\n";
+                sendMsg(_clientList[i]->_clientFd, sr);
+
+                flag = 1;
+            }
+            if (_clientList[i]->_nickname.empty())
+            {
+                std::string ss, sr;
+                ss = this->_hostname + " 431 * :No nickname given\n";
+                sendMsg(_clientList[i]->_clientFd, ss);
+                if (_clientList[i]->_nickname.empty())
+                    sr = this->_hostname + " NOTICE * :Please set a nickname using the /NICK command before joining channels.\n";
+                else
+                    sr = this->_hostname + " NOTICE " + _clientList[i]->_nickname + " :Please set a nickname using the /NICK command before joining channels.\n";
+                sendMsg(_clientList[i]->_clientFd, sr);
+
+                flag = 1;
+            }
+            if (flag == 1)
+            {
+                std::string ss;
+                if (_clientList[i]->_nickname.empty())
+                    ss = this->_hostname + " 475 * " + channelName + " :Cannot join channel (+k)\n";
+                else
+                    ss = this->_hostname + " 475 " + _clientList[i]->_nickname + " " + channelName + " :Cannot join channel (+k)\n";
+                sendMsg(_clientList[i]->_clientFd, ss);
+                return;
+            }
+        }
+
         // channel names MUST start with #
         if (channelName[0] == '#') {
-            /* Check if the channel already exists */
-            Channel *joinedChannel = nullptr;
-           // check channel if already exist !!!
+            // Check if the channel already exists
+            // check the channel if already exists
+            Channel *joinedChannel = NULL;
             std::vector<Channel *>::iterator it;
             for (it = _channels.begin(); it != _channels.end(); ++it) {
                 Channel *channel = *it;
@@ -63,7 +123,8 @@ void    Server::Join(std::string line, int i) {
                     break;
                 }
             }
-            if (joinedChannel != nullptr) // if exist
+            // in case the channel already exists
+            if (joinedChannel != NULL)
             {
                 // check if user doesnt belongs to the channel if no pushback him
                 int userJoined = 0; // ///// // // change this
@@ -77,86 +138,78 @@ void    Server::Join(std::string line, int i) {
                 if (userJoined == 0)
                 {
                     joinedChannel->_members.push_back(_clientList[i]);
-                    std::cout << "~" << _clientList[i]->_nickname << " has been joined " << channelName << " channel" << std::endl;
+                    std::cout << "~" << _clientList[i]->_nickname << " has been joined " << channelName << std::endl;
+
+                    std::string tmp = _hostname + " 001 " + _clientList[i]->_nickname + " :Welcome to the channel! Enjoy your stay.\n";
+                    sendMsg(_clientList[i]->_clientFd, tmp);
+
+                    /* inform everyone that user has joined */
+                    std::vector<Client *>::iterator it;
+                    for (it = joinedChannel->_members.begin(); it != joinedChannel->_members.end(); it++)
+                    {
+                        std::string message = channelName + " :New user " + _clientList[i]->_username + " has joined the channel.\n";
+                        if ((*it)->_clientFd != _clientList[i]->_clientFd)
+                            sendMsg((*it)->_clientFd, message);
+                    }
                 }
                 else
                     sendMsg(_clientList[i]->_clientFd, "you are already joined this channel before\n");
             }
-            /* if channel doesn't exists, create a new one */
-            else if (joinedChannel == nullptr) {
-                //std::cout << "joined #X" << std::endl;
+            // In case the channel doesn't exists before, create a new one
+            else if (joinedChannel == NULL) {
                 /* Creating new channel */
                 Channel *newChannel = new Channel(channelName);
                 this->_channels.push_back(newChannel);
-                std::cout << "[+] " << channelName << " channel created" << std::endl;
+                if (!channelPass.empty())
+                {
+                    newChannel->hasPassword = 1;
+                    newChannel->_pass = channelPass;
+                }
+                std::cout << channelName << " has been created!" << std::endl;
                 /* add user to channel members  */
                 // if new channel give the client elevated mode/permission on that channel
                 newChannel->_members.push_back(_clientList[i]); // clientList i + 1 - 1
-                //std::cout << "[+] Client " << " has been joined " << channelName << "channel" << std::endl;
-                std::cout << "~" << _clientList[i]->_nickname << " has been joined " << channelName << " channel" << std::endl;
-                /* inform everyone that user has joined */
-
-                // Count the number of members in the channel
-                // int memberCount = newChannel->_members.size();
-                // std::cout << "[*] Total member in channel " << channelName << " is: "<< memberCount << std::endl; 
+                std::cout << "~" << _clientList[i]->_nickname << " has been joined " << channelName << std::endl;
                 
-                /**/
-                // std::cout << "[*] " << channelName << " Channel members:\n";
-                // std::vector<Client *>::iterator it;
-                // for (it = newChannel->_members.begin(); it != newChannel->_members.end(); ++it) {
-                //     std::cout << " [x] " << (*it)->_nickname << "\n";
-                // }
-                std::string ss;
-                ss = this->_hostname + " 366 " + _clientList[i]->_nickname + " " + channelName + " :End of /Names list.\n";
-
+                std::string tmp = _hostname + " 001 " + _clientList[i]->_nickname + " :Welcome to the channel! Enjoy your stay.\n";
+                sendMsg(_clientList[i]->_clientFd, tmp);
+                
+                /* inform channel members that a new user joined */
+                std::vector<Client *>::iterator it;
+                for (it = newChannel->_members.begin(); it != newChannel->_members.end(); it++)
+                {
+                    std::string message = channelName + " :New user " + _clientList[i]->_username + " has joined the channel.\n";
+                    if ((*it)->_clientFd != _clientList[i]->_clientFd)
+                        sendMsg((*it)->_clientFd, message);
+                }
             }
-            // /* inform everyone that user has joined */
-            // size_t j = 0;
-            // size_t m = newChannel->_members.size();
-            // // while (j < Channel::_members)
-            // // {
-            // //     //
-            // // }
-        }
-        else
-        {
-            /**/
         }
     }
     else
     {
-        /* Example:
-        ("461 " + _nickName + " JOIN :Not enough parameters") */
-        std::string msg = "461 " + _clientList[i]->_nickname + "JOIN :Not enough parameters";
-        sendMsg(_clientList[i]->_clientFd, msg);
-        //std::cout << "" << std::endl;
+        std::string message = "461 " + _clientList[i]->_nickname + " JOIN :Not enough parameters.\n";
+        sendMsg(_clientList[i]->_clientFd, message);
     }
 }
 
 /*
-:server-name 366 your-nickname #channel :End of /NAMES list.
-*/
-
-/*
 check if user have (nickname, username, authenticated with valid pass)
-// iforming user joined the chnl in(rfc prototype)
-// inform all mmbers of channel the new joined user
 // manage channel password (if channel have password / ask new users for pass?)
 // msg #channel msg
 // msg ~nickname msg
 // quit or exit a channel (quit :Leaving)
-
-client with nickname ~toowan created #channel Channel
-client joined channel #channel
 
 -------
     banana
     
     [client->server]
     [client->server]:toowan@0 JOIN #seclab
-    /
-    #hackforums has been created! 
-    //check if authenticated and have nick, user, realname etc
     // if user disconnected o dar connect next time, kaytra mochkil dyal double userNIckname
-    //
 */
+
+
+/* 
+                    * represents the user's nickname (or in the case of 431,
+                    a wildcard to indicate that no nickname was given),
+                    and #channel represents the channel the user attempted to join.
+                */
