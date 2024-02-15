@@ -75,7 +75,6 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 - [ ] PRIVMSG
 - [ ] KICK
 - [ ] INVITE
-- [ ] TOPIC
 - [ ] MODE
 
 ## User Modes
