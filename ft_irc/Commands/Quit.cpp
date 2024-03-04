@@ -26,9 +26,9 @@ static int     countArguments(std::string line) {
 
 static void    sendMsg(int fd, std::string msg)
 {
-    const char *msssg = msg.c_str();
-    size_t msgSize = strlen(msssg);
-    if (send(fd, msssg, msgSize, 0) < 0) {
+    const char *_msg = msg.c_str();
+    size_t msgSize = strlen(_msg);
+    if (send(fd, _msg, msgSize, 0) < 0) {
         std::cout << "send failed" << std::endl;
     }
 }
@@ -42,12 +42,12 @@ void    Server::Quit(std::string line, int i) {
         this->_clientList[i]->_leaveMsg = line.substr(start); // delete / freeing the buffer
         /* Example:
         :username!user@host QUIT :bye guys! */
-        std::string msg = ":" + _clientList[i]->_username + "!" + _clientList[i]->_username + "@" + this->_hostname + " QUIT " + this->_clientList[i]->_leaveMsg;
+        std::string messageToSend = ":" + _clientList[i]->_username + "!" + _clientList[i]->_username + "@" + this->_hostname + " QUIT " + this->_clientList[i]->_leaveMsg + "\n";
         // loop on all clients and anounce them that client x has been disconnected
         size_t j = 0;
         while (j < _clientList.size()) { // && _clientList[i]-> joined to #channel
             if (_clientList[j]->_authenticated == 1)
-                sendMsg(_clientList[j]->_clientFd, msg);
+                sendMsg(_clientList[j]->_clientFd, messageToSend);
             j++;
         }
     }
@@ -57,26 +57,13 @@ void    Server::Quit(std::string line, int i) {
         // the client will be removed from vector stack here
         // and the following line will not works due that
         this->_clientList[i]->_leaveMsg = ":Leaving the server";
-        std::string msg = ":" + _clientList[i]->_username + "!" + _clientList[i]->_username + "@" + this->_hostname + " QUIT " + this->_clientList[i]->_leaveMsg;
+        std::string messageToSend = ":" + _clientList[i]->_username + "!" + _clientList[i]->_username + "@" + this->_hostname + " QUIT " + this->_clientList[i]->_leaveMsg + "\n";
         // loop on all clients and anounce them that client x has been disconnected
         size_t j = 0;
         while (j < _clientList.size()) { // && _clientList[i]-> joined to #channel
-            sendMsg(_clientList[j]->_clientFd, msg);
+            sendMsg(_clientList[j]->_clientFd, messageToSend);
             j++;
         }
     }
+    _clientList[i]->_joined = false;
 }
-
-/*
-Notes:
-[client server]   if nickname "to the IRC Network, !"
-if empty then make a default one
- (add color green and red + )
-*/
-// page correction
-
-/*
-- [x] JOIN
-- [x] WHO
-- [x] WHOIS
-*/

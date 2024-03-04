@@ -14,6 +14,37 @@
 #include "../Include/Client.hpp"
 #include "../Include/Channel.hpp"
 
+//_joinedChannel
+// void    Server::removeClientFromChannels(Client *client)
+// {
+//     //Channel channels;
+
+//     for (size_t i = 0; i < _channels.size(); ++i) {
+//         if (_channels[i]->_name == client->_joinedChannel) {
+//             _channels[i]->clients.erase(_channels[i]->_members.begin() + j);
+//             break;
+//         }
+//     }
+//     // notify other clients about the removal
+// }
+
+void Server::removeClientFromChannels(Client *client) {
+    for (size_t i = 0; i < _channels.size(); ++i) {
+        if (_channels[i]->_name == client->_joinedChannel) {
+            // Find the client in the channel's list of clients
+            for (size_t j = 0; j < _channels[i]->_members.size(); ++j) {
+                if (_channels[i]->_members[j] == client) {
+                    // Remove the client from the channel's list of clients
+                    _channels[i]->_members.erase(_channels[i]->_members.begin() + j);
+                    // Optionally notify other clients about the removal
+                    break;
+                }
+            }
+            break; // Stop searching for the channel once the client is found and removed
+        }
+    }
+}
+
 void    Server::handleDisconnection(int i) {
     i = i - 1; // because i = 1 and the index of clients starts from 0
     std::string nickname = this->_clientList[i]->_nickname;
@@ -22,6 +53,7 @@ void    Server::handleDisconnection(int i) {
     delete this->_clientList[i];
     this->_clientList.erase(this->_clientList.begin() + i);
     this->_pfds.erase(this->_pfds.begin() + i + 1);
+    removeClientFromChannels(this->_clientList[i]);
     close(fd);
     std::cout << "~" << nickname << " has been disconnected" << std::endl;
 }
@@ -150,73 +182,24 @@ void    Server::parse_cmd(std::string line, int i) {
         Quit(line, i);
     else if (startsWith(line, "list") || startsWith(line, "LIST"))
         List(line, i);
+
+    // else if (startsWith(line, "invite") || startsWith(line, "Invite"))
+    //     Invite(line, i);
+    // else if (startsWith(line, "kick") || startsWith(line, "Kick"))
+    //     Kick(line, i);
+    // else if (startsWith(line, "mode") || startsWith(line, "Mode"))
+    //     Mode(line, i);
+    // else if (startsWith(line, "msg") || startsWith(line, "Msg"))
+    //     Msg(line, i);
+    // else if (startsWith(line, "privmsg") || startsWith(line, "Privmsg"))
+    //     Privmsg(line, i);
+    // else if (startsWith(line, "topic") || startsWith(line, "Topic"))
+    //     Topic(line, i);
+    // else if (startsWith(line, "who") || startsWith(line, "Who"))
+    //     Who(line, i);
+
     else if (startsWith(line, "whois") || startsWith(line, "WHOIS"))
-    {
-        if (this->_clientList[i]->_authenticated == false) {
-            //send msg to client
-            const char *msg = "Not authenticated yet! Enter a valid password\n";
-            int msgsize = strlen(msg);
-            int bytesSend = send(this->_clientList[i]->_clientFd, msg, msgsize, 0);
-            if (bytesSend < 0) {
-                //
-                std::cout << "send failed" << std::endl;
-            }
-        } else {
-        int args = countArguments(line);
-        if (args > 1) {
-            std::string cmd = "whois";
-            int start = cmd.length() + 1;
-            std::string nickname = line.substr(start);
-            if (this->_clientList[i]->_nickname == nickname)
-            {
-                /* if whois <my_nickname> */
-            }
-            /* else */
-
-            std::vector<Client *> clientList;
-            clientList = this->_clientList;
-            int fddd = i;
-            size_t i = 0; // change i to j or y or whatever
-            bool found = false;
-            while (i < clientList.size())
-            {
-                if (clientList[i]->_nickname == line.substr(start)) {
-                    std::string sendMsg;;
-                    sendMsg = "==========================================================\n";
-                    sendMsg += "userName:\t" + this->_clientList[i]->_username + "\n";
-                    sendMsg += "realName:\t" + this->_clientList[i]->_realName + "\n";
-                    sendMsg += "nickName:\t" + this->_clientList[i]->_nickname + "\n";
-                    sendMsg += "userMode:\t" + this->_clientList[i]->_userMode + "\n";
-                    sendMsg += "IP Address:\t" + this->_clientList[i]->_IPAddress + "\n";
-                    std::string authenticated = "No";
-                    if (this->_clientList[i]->_authenticated == true) {
-                        authenticated = "Yes";
-                    }
-                    sendMsg += "authenticated:\t" + authenticated + "\n";
-                    sendMsg += "leaveMsg:\t" + this->_clientList[i]->_leaveMsg + "\n";
-                    sendMsg += "==========================================================\n";
-                    const char *sendMsg2 = sendMsg.c_str();
-                    size_t msgSize = strlen(sendMsg2);
-                    // Use ssize_t for the return type of send
-                    ssize_t bytesSent = send(this->_clientList[fddd]->_clientFd, sendMsg2, msgSize, 0);
-                    if (bytesSent < 0) {
-                        std::cout << "send failed!" << std::endl;
-                    }
-
-                    found = true;
-                    break ;
-                }
-                ++i; //i++;
-            }
-            if (found == false) {
-                std::string msgS = "There is no user with nickname ~" + nickname + "\n";
-                const char *msgS2 = msgS.c_str();
-                if (send(this->_clientList[fddd]->_clientFd, msgS2, strlen(msgS2), 0) < 0) {
-                    std::cout << "send failed!" << std::endl;
-                }
-            }
-        } }
-    }
+        Whois(line, i);
     // realname  _buffer
 }
 
@@ -347,4 +330,10 @@ std::vector<std::string> split(const std::string &s, char delimiter) {
 
     return tokens;
 }
+*/
+
+
+/*
+:irc.host.com NOTICE * :*** Looking up your hostname...
+:irc.host.com NOTICE * :*** Could not resolve your hostname: Domain not found; using your IP address () instead.
 */

@@ -16,9 +16,9 @@
 
 static void    sendMsg(int fd, std::string msg)
 {
-    const char *msssg = msg.c_str();
-    size_t msgSize = strlen(msssg);
-    if (send(fd, msssg, msgSize, 0) < 0) {
+    const char *_msg = msg.c_str();
+    size_t msgSize = strlen(_msg);
+    if (send(fd, _msg, msgSize, 0) < 0) {
         std::cout << "send failed" << std::endl;
     }
 }
@@ -38,7 +38,7 @@ void    Server::List(std::string line, int i) {
     sendMsg(_clientList[i]->_clientFd, message);
     for (it = _channels.begin(); it != _channels.end(); ++it)
     {
-        // #channel_name 50 :Channel topic here
+        // #channel_name 50 :Channel_topic
         Channel *channel = *it;
         message = _hostname + " 322 " + _clientList[i]->_nickname + " " + channel->_name + " " + intToString(channel->_members.size()) + " :" + channel->_topic + "\n";
         sendMsg(_clientList[i]->_clientFd, message);

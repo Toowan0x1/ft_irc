@@ -20,7 +20,6 @@
 class   Client {
     public:
         int _clientFd;
-        //struct pollfd       _fd;
         struct sockaddr_in  _addr;
         std::string _username;
         std::string _nickname;
@@ -33,6 +32,7 @@ class   Client {
         bool _authenticated;
         bool _joined;
         bool _keepAlive;
+        std::string _joinedChannel;
 
         std::string _leaveMsg;
 

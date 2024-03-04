@@ -26,9 +26,9 @@ static int     countArguments(std::string line) {
 
 static void    sendMsg(int fd, std::string msg)
 {
-    const char *msssg = msg.c_str();
-    size_t msgSize = strlen(msssg);
-    if (send(fd, msssg, msgSize, 0) < 0) {
+    const char *_msg = msg.c_str();
+    size_t msgSize = strlen(_msg);
+    if (send(fd, _msg, msgSize, 0) < 0) {
         std::cout << "send failed" << std::endl;
     }
 }

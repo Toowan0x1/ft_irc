@@ -19,7 +19,7 @@ Client::Client(int &clientFD) :
     _clientFd(clientFD),
     _userMode("0"),
     _authenticated(0),
-    _joined(0),
+    _joined(false),
     _keepAlive(1)
 {
     /**/

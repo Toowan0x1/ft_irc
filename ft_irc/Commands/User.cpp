@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../Include/Server.hpp"
 #include "../Include/Client.hpp"
 #include "../Include/Channel.hpp"
@@ -27,9 +26,9 @@ static int     countArguments(std::string line) {
 
 static void    sendMsg(int fd, std::string msg)
 {
-    const char *msssg = msg.c_str();
-    size_t msgSize = strlen(msssg);
-    if (send(fd, msssg, msgSize, 0) < 0) {
+    const char *_msg = msg.c_str();
+    size_t msgSize = strlen(_msg);
+    if (send(fd, _msg, msgSize, 0) < 0) {
         std::cout << "send failed" << std::endl;
     }
 }
@@ -47,7 +46,7 @@ bool isValidString(const std::string& str) {
             return false;  // Character is not a letter or space
         }
     }
-    return true;  // All characters are valid
+    return true;
 }
 
 // bool isValidString(const std::string& str)
@@ -74,11 +73,11 @@ void    Server::User(std::string line, int i)
         while (iss && j <= args)
         {
             if (j == 1)
-                iss >> cmd;
+                iss >> cmd;     // Command
             else if (j == 2)
-                iss >> username;
+                iss >> username; // Username
             else if (j == 3)
-                iss >> usermode;
+                iss >> usermode; // UserMode
             else if (j == 4)
                 iss >> hostname; // Placeholder for hostname or Ip.
             else if (j == 5)
@@ -88,34 +87,35 @@ void    Server::User(std::string line, int i)
             }
             else if (j > 5)
             {
-                realname += " ";
+                realname += " "; // Real Name
                 iss >> tmp;
                 realname += tmp;
             }
             j++;
         }
 
-        // check hostname placeholder
+        // Check hostname placeholder
         if (!hostname.empty())
         {
-            std::string msg = "hostname (" + hostname + ") set to: " + this->_clientList[i]->_hostname + "\n";
-            sendMsg(_clientList[i]->_clientFd, msg);
+            std::string messageToSend = "hostname (" + hostname + ") set to: " + this->_clientList[i]->_hostname + "\n";
+            sendMsg(_clientList[i]->_clientFd, messageToSend);
         }
 
-        // check usermodes:
-        if (usermode.length() == 1 && (usermode[0] == '0' || usermode[0] == 'i'
+        // Check usermodes:
+        if (usermode.length() == 1 && (usermode[0] == '*'
+                || usermode[0] == '0' || usermode[0] == 'i'
                 || usermode[0] == 'o' || usermode[0] == 'w'
                 || usermode[0] == 'a' || usermode[0] == 'r'))
         {
                 this->_clientList[i]->_userMode = usermode;
-                std::string msg = "Usermode set to: " + usermode + "\n";
-                sendMsg(_clientList[i]->_clientFd, msg);
+                std::string messageToSend = "Usermode set to: " + usermode + "\n";
+                sendMsg(_clientList[i]->_clientFd, messageToSend);
         }
         else {
             sendMsg(this->_clientList[i]->_clientFd,"Invalid mode. Please enter one of the valid modes (i, o, w, a, r).\n");
         }
 
-        // check double username:
+        // Check double username:
         std::vector<Client *> clientList;
         clientList = this->_clientList;
         size_t k = 0;
@@ -145,27 +145,17 @@ void    Server::User(std::string line, int i)
             }
         }
 
-        // check realname:
+        // Check realname:
         if (realname.length() >= 35 || isValidString(realname) == 0)
         {
-            std::string msg = "Invalid realname. Please ensure it has at most 35 characters and contains only letters.\n"; ///
-            sendMsg(this->_clientList[i]->_clientFd, msg);
+            std::string messageToSend = "Invalid realname. Please ensure it has at most 35 characters and contains only letters.\n"; ///
+            sendMsg(this->_clientList[i]->_clientFd, messageToSend);
         }
         else
         {
             this->_clientList[i]->_realName = realname;
-            std::string msg = "Realname set to: " + realname + "\n";
-            sendMsg(_clientList[i]->_clientFd, msg);
+            std::string messageToSend = "Realname set to: " + realname + "\n";
+            sendMsg(_clientList[i]->_clientFd, messageToSend);
         }
     }
 }
-
-/*
-USER johnq * * :John Q. Hacker
-NICK johnq
-
-:irc.host.com NOTICE * :*** Looking up your hostname...
-:irc.host.com NOTICE * :*** Could not resolve your hostname: Domain not found; using your IP address () instead.
-
-CTRL+D
-*/

@@ -26,9 +26,9 @@ static int     countArguments(std::string line) {
 
 static void    sendMsg(int fd, std::string msg)
 {
-    const char *msssg = msg.c_str();
-    size_t msgSize = strlen(msssg);
-    if (send(fd, msssg, msgSize, 0) < 0) {
+    const char *_msg = msg.c_str();
+    size_t msgSize = strlen(_msg);
+    if (send(fd, _msg, msgSize, 0) < 0) {
         std::cout << "send failed" << std::endl;
     }
 }
@@ -55,11 +55,11 @@ void    Server::Join(std::string line, int i) {
         {
             if (_clientList[i]->_joined == true)
             {
-                std::string message;
-                message = _hostname + " NOTICE " + _clientList[i]->_nickname + " You are already in a channel. You cannot join another one.\n";
-                sendMsg(_clientList[i]->_clientFd, message);
-                message = _hostname + " NOTICE " + _clientList[i]->_nickname + " Leave this channel in order to join another one.\n";
-                sendMsg(_clientList[i]->_clientFd, message);
+                std::string messageToSend;
+                messageToSend = _hostname + " NOTICE " + _clientList[i]->_nickname + " You are already in a channel. You cannot join another one.\n";
+                sendMsg(_clientList[i]->_clientFd, messageToSend);
+                messageToSend = _hostname + " NOTICE " + _clientList[i]->_nickname + " Leave this channel in order to join another one.\n";
+                sendMsg(_clientList[i]->_clientFd, messageToSend);
                 return;
             }
         }
@@ -156,6 +156,7 @@ void    Server::Join(std::string line, int i) {
                 {
                     joinedChannel->_members.push_back(_clientList[i]);
                     _clientList[i]->_joined = true;
+                    _clientList[i]->_joinedChannel = channelName;
                     std::cout << "~" << _clientList[i]->_nickname << " has been joined " << channelName << std::endl;
 
                     std::string tmp = _hostname + " 001 " + _clientList[i]->_nickname + " :Welcome to the channel! Enjoy your stay.\n";

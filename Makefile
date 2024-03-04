@@ -25,6 +25,12 @@ SRC :=	ft_irc/main.cpp		\
 		ft_irc/Commands/Quit.cpp \
 		ft_irc/Commands/Join.cpp \
 		ft_irc/Commands/List.cpp \
+		ft_irc/Commands/Whois.cpp \
+		# ft_irc/Commands/Who.cpp \
+		# ft_irc/Commands/Kick.cpp \
+		# ft_irc/Commands/Mode.cpp \
+		# ft_irc/Commands/Msg.cpp \
+		# ft_irc/Commands/Privmsg.cpp \
 		
 
 # Generate the list of object files based on source files

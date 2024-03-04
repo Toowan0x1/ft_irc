@@ -59,6 +59,17 @@ class Server {
         void    Quit(std::string line, int clientFd);
         void    Join(std::string line, int clientFd);
         void    List(std::string line, int clientFd);
+
+        void    removeClientFromChannels(Client *client);
+
+        // void    Msg(std::string line, int clientFd);
+        // void    Privmsg(std::string line, int clientFd);
+        // void    Kick(std::string line, int clientFd);
+        // void    Invite(std::string line, int clientFd);
+        // void    Mode(std::string line, int clientFd);
+        // void    Topic(std::string line, int clientFd);
+        // void    Who(std::string line, int clientFd);
+        void    Whois(std::string line, int clientFd);
         
         bool    startsWith(const std::string&, const std::string&);
         ~Server();
