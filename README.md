@@ -19,6 +19,13 @@ Internet Relay Chat is implemented as an application layer protocol to facilitat
 | External functs | Everything in C++ 98. socket, close, setsockopt, getsockname, getprotobyname, gethostbyname, getaddrinfo, freeaddrinfo, bind, connect, listen, accept, htons, htonl, ntohs, ntohl, inet_addr, inet_ntoa, send, recv, signal, lseek, fstat, fcntl, poll (or equivalent) |
 | Libft authorized | n/a |
 
+- User Modes to be implemented
+  1. **`i` (invisible):** Makes the user invisible to others who query the server for a list of users.
+  2. **`o` (operator):** Grants administrative privileges to the user, allowing them to perform certain administrative actions on the network.
+  3. **`w` (wallops):** Allows the user to receive server WALLOPS messages, which are typically used for important network-wide announcements.
+  4. **`a` (away):** Marks the user as being away from the keyboard or not actively participating in the conversation.
+  5. **`r` (restricted):** Limits the user's ability to receive messages from channels they haven't joined.
+
 ## Bonus Part
 
 Some extra features to be added into IRC server so it looks even more like and actual IRC server:
