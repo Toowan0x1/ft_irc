@@ -54,14 +54,35 @@ void    Server::Mode(std::string line, int i) {
             j++;
         }
 
-        // if channel
-        if (arg1[0] == '#') {
-            //
+        // Setting both channel, and user modes
+        if (args == 3)
+        {
+            // Setting Channel Modes
+            if (arg1[0] == '#') {
+                //
+            }
+            // Setting User Modes
+            else {
+                //
+            }
         }
-
-        // if nickname
-        else {
+        // Querying User or Channel Modes
+        else if (args == 2)
+        {
             //
         }
     }
 }
+
+/*
+
+MODE #channel +p    // Set private mode
+MODE #channel -m    // Unset moderated mode
+
+MODE nickname +i    // Set invisible mode
+MODE nickname -a    // Unset away mode
+
+MODE nickname       // Query user modes
+MODE #channel       // Query channel modes
+
+*/
