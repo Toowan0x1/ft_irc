@@ -47,15 +47,13 @@ void Server::removeClientFromChannels(Client *client) {
 
 void    Server::handleDisconnection(int i) {
     i = i - 1; // because i = 1 and the index of clients starts from 0
-    std::string nickname = this->_clientList[i]->_nickname;
-    int fd;
-    fd = this->_pfds[i + 1].fd;
+    int fd = this->_pfds[i + 1].fd;
     delete this->_clientList[i];
     this->_clientList.erase(this->_clientList.begin() + i);
     this->_pfds.erase(this->_pfds.begin() + i + 1);
-    removeClientFromChannels(this->_clientList[i]);
+    //removeClientFromChannels(this->_clientList[i]);
     close(fd);
-    std::cout << "~" << nickname << " has been disconnected" << std::endl;
+    std::cout << "~" << this->_clientList[i]->_nickname << " has been disconnected" << std::endl;
 }
 
 void    Server::handleNewConnection()

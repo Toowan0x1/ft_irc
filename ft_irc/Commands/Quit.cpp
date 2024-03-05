@@ -36,19 +36,30 @@ static void    sendMsg(int fd, std::string msg)
 void    Server::Quit(std::string line, int i) {
     int args = countArguments(line);
     if (args > 1) {
+        std::stringstream iss(line);
+        std::string cmd, message;
+
+        // loop on arguments
+        int j = 0;
+        while (iss && j <= args)
+        {
+            if (j == 1)
+                iss >> cmd;     // Command
+            else if (j == 2)
+                iss >> message; // Message
+            j++;
+        }
         //handleDisconnection(i + 1);
-        std::string cmd = "quit";
-        int start = cmd.length() + 1;
-        this->_clientList[i]->_leaveMsg = line.substr(start); // delete / freeing the buffer
+        this->_clientList[i]->_leaveMsg = message;
         /* Example:
         :username!user@host QUIT :bye guys! */
         std::string messageToSend = ":" + _clientList[i]->_username + "!" + _clientList[i]->_username + "@" + this->_hostname + " QUIT " + this->_clientList[i]->_leaveMsg + "\n";
         // loop on all clients and anounce them that client x has been disconnected
-        size_t j = 0;
-        while (j < _clientList.size()) { // && _clientList[i]-> joined to #channel
-            if (_clientList[j]->_authenticated == 1)
-                sendMsg(_clientList[j]->_clientFd, messageToSend);
-            j++;
+        size_t y = 0;
+        while (y < _clientList.size()) { // && _clientList[i]-> joined to #channel
+            if (_clientList[y]->_authenticated == 1)
+                sendMsg(_clientList[y]->_clientFd, messageToSend);
+            y++;
         }
     }
     else {
@@ -65,5 +76,19 @@ void    Server::Quit(std::string line, int i) {
             j++;
         }
     }
+    std::cout << "0 >>" << this->_clientList[0]->_nickname << "\n";
+    std::cout << "1 >>" << this->_clientList[1]->_nickname << "\n";
     _clientList[i]->_joined = false;
+    int fd = this->_pfds[i + 1].fd;
+    delete this->_clientList[i];
+    this->_clientList.erase(this->_clientList.begin() + i);
+    this->_pfds.erase(this->_pfds.begin() + i);
+    close(fd);
+    std::cout << "~" << this->_clientList[i]->_nickname << " has been disconnected" << std::endl;
+    std::cout << "0 >>" << this->_clientList[0]->_nickname << "\n";
+    std::cout << "1 >>" << this->_clientList[1]->_nickname << "\n";
 }
+
+/*
+joined this channel before
+*/

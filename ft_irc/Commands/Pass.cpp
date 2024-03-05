@@ -44,18 +44,18 @@ void    Server::Pass(std::string line, int i)
         this->_clientList[i]->_password = line.substr(start);
         if (this->_clientList[i]->_password.compare(Server::_password) == 0)
         {
-            std::string msg;
+            std::string messageToSend;
             this->_clientList[i]->_authenticated = true;
-            //if (_clientList[i]->_username.empty())
-               // msg = ":" + this->_hostname + " 001 " + this->_clientList[i]->_username + " :Welcome to the IRC Network, " + this->_clientList[i]->_username + "!\n";
-            //else
-                msg = ":" + this->_hostname + " 001 " + this->_clientList[i]->_username + " :Welcome to the IRC Network, " + this->_clientList[i]->_username + "!\n";
-            sendMsg(_clientList[i]->_clientFd, msg);
+            if (_clientList[i]->_username.empty())
+               messageToSend = ":" + this->_hostname + " Welcome to the IRC Network\n";
+            else
+                messageToSend = ":" + this->_hostname + " 001 " + this->_clientList[i]->_username + " :Welcome to the IRC Network, " + this->_clientList[i]->_username + "!\n";
+            sendMsg(_clientList[i]->_clientFd, messageToSend);
         }
         else
         {
-            std::string msg = ":" + this->_hostname + " 464 * :Password incorrect\n";
-            sendMsg(_clientList[i]->_clientFd, msg);
+            std::string messageToSend = ":" + this->_hostname + " 464 * :Password incorrect\n";
+            sendMsg(_clientList[i]->_clientFd, messageToSend);
         }
     }
 }
