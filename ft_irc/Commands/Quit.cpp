@@ -87,6 +87,7 @@ void    Server::Quit(std::string line, int i) {
     std::cout << "~" << this->_clientList[i]->_nickname << " has been disconnected" << std::endl;
     std::cout << "0 >>" << this->_clientList[0]->_nickname << "\n";
     std::cout << "1 >>" << this->_clientList[1]->_nickname << "\n";
+    // removeclient from chqnnel
 }
 
 /*

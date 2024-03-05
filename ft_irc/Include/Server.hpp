@@ -68,7 +68,7 @@ class Server {
         // void    Invite(std::string line, int clientFd);
         // void    Mode(std::string line, int clientFd);
         // void    Topic(std::string line, int clientFd);
-        // void    Who(std::string line, int clientFd);
+        void    Who(std::string line, int clientFd);
         void    Whois(std::string line, int clientFd);
         
         bool    startsWith(const std::string&, const std::string&);

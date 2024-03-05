@@ -193,8 +193,8 @@ void    Server::parse_cmd(std::string line, int i) {
     //     Privmsg(line, i);
     // else if (startsWith(line, "topic") || startsWith(line, "Topic"))
     //     Topic(line, i);
-    // else if (startsWith(line, "who") || startsWith(line, "Who"))
-    //     Who(line, i);
+    else if (startsWith(line, "who") || startsWith(line, "Who"))
+        Who(line, i);
 
     else if (startsWith(line, "whois") || startsWith(line, "WHOIS"))
         Whois(line, i);
