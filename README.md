@@ -22,7 +22,7 @@ Internet Relay Chat is implemented as an application layer protocol to facilitat
 ### User Modes to be implemented:
   - **`i` (invisible):** Makes the user invisible to others who query the server for a list of users.
   - **`o` (operator):** Grants administrative privileges to the user, allowing them to perform certain administrative actions on the network.
-  -**`w` (wallops):** Allows the user to receive server WALLOPS messages, which are typically used for important network-wide announcements.
+  - **`w` (wallops):** Allows the user to receive server WALLOPS messages, which are typically used for important network-wide announcements.
   - **`a` (away):** Marks the user as being away from the keyboard or not actively participating in the conversation.
   - **`r` (restricted):** Limits the user's ability to receive messages from channels they haven't joined.
 
