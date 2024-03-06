@@ -94,7 +94,7 @@ void    Server::Mode(std::string line, int i) {
                 }
                 if (flag == 1)
                 {
-                    if (_clientList[i]->_userMode)
+                    //if (_clientList[i]->_userMode)
                 }
                 else
                 {

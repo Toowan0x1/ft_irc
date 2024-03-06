@@ -51,7 +51,7 @@ void    Server::handleDisconnection(int i) {
     delete this->_clientList[i];
     this->_clientList.erase(this->_clientList.begin() + i);
     this->_pfds.erase(this->_pfds.begin() + i + 1);
-    //removeClientFromChannels(this->_clientList[i]);
+    removeClientFromChannels(this->_clientList[i]);
     close(fd);
     std::cout << "~" << this->_clientList[i]->_nickname << " has been disconnected" << std::endl;
 }
@@ -205,8 +205,6 @@ void    Server::AcceptMsg(int i) {
     // use client buffer instead
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
-
-    this->_clientList[i]->
 
     int receivedBytes = recv(this->_pfds[i].fd, buffer, sizeof(buffer), 0);
     if (receivedBytes < 0) {

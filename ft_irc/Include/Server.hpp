@@ -75,6 +75,7 @@ class Server {
         ~Server();
         void    AcceptMsg(int i);
         void    handleDisconnection(int i);
+        int     countMembers();
         
 };
 // clientPfds

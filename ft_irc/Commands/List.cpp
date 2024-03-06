@@ -30,6 +30,19 @@ std::string intToString(int value) {
     return ss.str();
 }
 
+int    Server::countMembers(std::string channelName)
+{
+    std::vector<Channel *> channels;
+    size_t i = 0;
+    while (i < channels.size())
+    {
+        if (channels[i]->_name == channelName)
+        {
+            while (channels[i]->)
+        }
+    }
+}
+
 void    Server::List(std::string line, int i) {
     (void)line;
     std::vector<Channel *>::iterator it;
@@ -40,6 +53,7 @@ void    Server::List(std::string line, int i) {
     {
         // #channel_name 50 :Channel_topic
         Channel *channel = *it;
+        // message = _hostname + " 322 " + _clientList[i]->_nickname + " " + channel->_name + " " + intToString(channel->_members.size()) + " :" + channel->_topic + "\n";
         message = _hostname + " 322 " + _clientList[i]->_nickname + " " + channel->_name + " " + intToString(channel->_members.size()) + " :" + channel->_topic + "\n";
         sendMsg(_clientList[i]->_clientFd, message);
     }
@@ -57,3 +71,5 @@ void sendNumericReply(int code, const std::string& message) {
 // Simulate sending the RPL_LISTSTART message
 sendNumericReply(321, "Channel :Users Name");
 */
+
+// leave msg who
