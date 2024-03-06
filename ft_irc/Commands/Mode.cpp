@@ -24,14 +24,14 @@ static int     countArguments(std::string line) {
     return (count);
 }
 
-// static void    sendMsg(int fd, std::string msg)
-// {
-//     const char *_msg = msg.c_str();
-//     size_t msgSize = strlen(_msg);
-//     if (send(fd, _msg, msgSize, 0) < 0) {
-//         std::cout << "send failed" << std::endl;
-//     }
-// }
+static void    sendMsg(int fd, std::string msg)
+{
+    const char *_msg = msg.c_str();
+    size_t msgSize = strlen(_msg);
+    if (send(fd, _msg, msgSize, 0) < 0) {
+        std::cout << "send failed" << std::endl;
+    }
+}
 
 void    Server::Mode(std::string line, int i) {
     (void)i;
@@ -55,15 +55,52 @@ void    Server::Mode(std::string line, int i) {
         }
 
         // Setting both channel, and user modes
+        int flag = 0;
         if (args == 3)
         {
             // Setting Channel Modes
-            if (arg1[0] == '#') {
-                //
-            }
+            // if (arg1[0] == '#') {
+            //     std::vector<Channel *>::iterator it;
+            //     for (it = _channels.begin(); it != _channels.end(); ++it)
+            //     {
+            //         Channel *channel = *it;
+            //         if (channel->_name == arg1)
+            //         {
+            //             flag = 1;
+            //             break;
+            //         }
+            //     }
+            //     if (flag == 1)
+            //     {
+            //         // mode channel 
+            //     }
+            //     else
+            //     {
+            //         //
+            //     }
+            // }
+
             // Setting User Modes
-            else {
-                //
+            if (1) {
+                std::vector<Client *>::iterator it;
+                for (it = _clientList.begin(); it != _clientList.end(); ++it)
+                {
+                    Client *client = *it;
+                    if (client->_nickname == arg1)
+                    {
+                        flag = 1;
+                        break;
+                    }
+                }
+                if (flag == 1)
+                {
+                    if (_clientList[i]->_userMode)
+                }
+                else
+                {
+                    std::string messageToSend = "";
+                    sendMsg(_clientList[i]->_clientFd, messageToSend);
+                }
             }
         }
         // Querying User or Channel Modes

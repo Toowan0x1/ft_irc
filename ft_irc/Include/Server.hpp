@@ -52,7 +52,7 @@ class Server {
         void    setServerAddrInfo();
         void    bindServerSocket();
         void    handleNewConnection();
-        void    parse_cmd(std::string, int i);//int i
+        void    parse_cmd(std::string, int i); //int i
         void    User(std::string line, int clientFd);
         void    Pass(std::string line, int clientFd);
         void    Nick(std::string line, int clientFd);

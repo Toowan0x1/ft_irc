@@ -206,6 +206,8 @@ void    Server::AcceptMsg(int i) {
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
 
+    this->_clientList[i]->
+
     int receivedBytes = recv(this->_pfds[i].fd, buffer, sizeof(buffer), 0);
     if (receivedBytes < 0) {
         std::runtime_error("recv error");
