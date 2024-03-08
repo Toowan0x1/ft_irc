@@ -75,7 +75,8 @@ class Server {
         ~Server();
         void    AcceptMsg(int i);
         void    handleDisconnection(int i);
-        int     countMembers();
+        int     countChannelMembers(std::string channelName);
+
         
 };
 // clientPfds

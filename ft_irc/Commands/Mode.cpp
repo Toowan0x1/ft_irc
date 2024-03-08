@@ -43,78 +43,80 @@ void    Server::Mode(std::string line, int i) {
 
         // loop on arguments
         int j = 0;
-        while (iss && j <= args)
+        if (args == 3)
         {
-            if (j == 1)
-                iss >> cmd;     // Command
-            else if (j == 2)
-                iss >> arg1;    // Channel, or Nickname
-            else if (j == 3)
-                iss >> mode;    // Mode
-            j++;
+            while (iss && j <= args)
+            {
+                if (j == 1)
+                    iss >> cmd;     // Command
+                else if (j == 2)
+                    iss >> arg1;    // User Nickname
+                else if (j == 3)
+                    iss >> mode;    // Mode
+                j++;
+            }
+        }
+        else if (args == 2)
+        {
+            while (iss && j <= args)
+            {
+                if (j == 1)
+                    iss >> cmd;     // Command
+                else if (j == 2)
+                    iss >> arg1;    // User Nickname
+                j++;
+            }
         }
 
-        // Setting both channel, and user modes
+        // Setting user modes
         int flag = 0;
         if (args == 3)
         {
-            // Setting Channel Modes
-            // if (arg1[0] == '#') {
-            //     std::vector<Channel *>::iterator it;
-            //     for (it = _channels.begin(); it != _channels.end(); ++it)
-            //     {
-            //         Channel *channel = *it;
-            //         if (channel->_name == arg1)
-            //         {
-            //             flag = 1;
-            //             break;
-            //         }
-            //     }
-            //     if (flag == 1)
-            //     {
-            //         // mode channel 
-            //     }
-            //     else
-            //     {
-            //         //
-            //     }
-            // }
-
-            // Setting User Modes
-            if (1) {
-                std::vector<Client *>::iterator it;
-                for (it = _clientList.begin(); it != _clientList.end(); ++it)
+            std::vector<Client *>::iterator it;
+            for (it = _clientList.begin(); it != _clientList.end(); ++it)
+            {
+                Client *client = *it;
+                if (client->_nickname == arg1)
                 {
-                    Client *client = *it;
-                    if (client->_nickname == arg1)
-                    {
-                        flag = 1;
-                        break;
-                    }
-                }
-                if (flag == 1)
-                {
-                    //if (_clientList[i]->_userMode)
-                }
-                else
-                {
-                    std::string messageToSend = "";
-                    sendMsg(_clientList[i]->_clientFd, messageToSend);
+                    flag = 1;
+                    break;
                 }
             }
+            if (flag == 1)
+            {
+                //if (_clientList[i]->_userMode)
+            }
+            else
+            {
+                std::string messageToSend = "";
+                sendMsg(_clientList[i]->_clientFd, messageToSend);
+            }
         }
-        // Querying User or Channel Modes
+
+        // Querying User Modes
         else if (args == 2)
         {
-            //
+            std::vector<Client *>::iterator it;
+            for (it = _clientList.begin(); it != _clientList.end(); ++it) {
+                Client *client = *it;
+                if (client->_nickname == arg1) {
+                    //flag = 1;
+                    std::string messageToSend = "MODE " + arg1 + " " + client->_userMode + "\n";
+                    sendMsg(_clientList[i]->_clientFd, messageToSend);
+                    flag = 1;
+                    break;
+                }
+            }
+            if (!flag)
+            {
+                std::string messageToSend = "";
+                sendMsg(_clientList[i]->_clientFd, messageToSend);
+            }
         }
     }
 }
 
 /*
-
-MODE #channel +p    // Set private mode
-MODE #channel -m    // Unset moderated mode
 
 MODE nickname +i    // Set invisible mode
 MODE nickname -a    // Unset away mode

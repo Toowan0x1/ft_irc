@@ -30,17 +30,29 @@ std::string intToString(int value) {
     return ss.str();
 }
 
-int    Server::countMembers(std::string channelName)
+static int hasCharacter(const std::string& str, char ch) {
+    return (str.find(ch) != std::string::npos) ? 1 : 0;
+}
+
+int    Server::countChannelMembers(std::string channelName)
 {
     std::vector<Channel *> channels;
-    size_t i = 0;
-    while (i < channels.size())
+    int count = 0;
+    for (size_t i = 0; i < channels.size(); ++i)
     {
         if (channels[i]->_name == channelName)
         {
-            while (channels[i]->)
+            std::vector<Client *> members = channels[i]->_members;
+            for (size_t j = 0; members.size() ; ++j)
+            {
+                if (!hasCharacter(members[j]->_userMode, 'i')) {
+                    count++;
+                }
+            }
+            break;
         }
     }
+    return count;
 }
 
 void    Server::List(std::string line, int i) {

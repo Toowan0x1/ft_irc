@@ -33,7 +33,6 @@ class   Client {
         bool _joined;
         bool _keepAlive;
         std::string _joinedChannel;
-
         std::string _leaveMsg;
 
         // Map to store channel modes for each channel the user is in
