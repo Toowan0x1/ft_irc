@@ -102,17 +102,14 @@ void    Server::User(std::string line, int i)
         }
 
         // Check usermodes:
-        if (usermode.length() == 1 && (usermode[0] == '*'
-                || usermode[0] == '0' || usermode[0] == 'i'
-                || usermode[0] == 'o' || usermode[0] == 'w'
-                || usermode[0] == 'a' || usermode[0] == 'r'))
+        if (usermode.length() == 1 && (usermode[0] == '*' || usermode[0] == '0'))
         {
-                this->_clientList[i]->_userMode = usermode;
+                //this->_clientList[i]->_userMode = usermode;
                 std::string messageToSend = "Usermode set to: " + usermode + "\n";
                 sendMsg(_clientList[i]->_clientFd, messageToSend);
         }
         else {
-            sendMsg(this->_clientList[i]->_clientFd,"Invalid mode. Please enter one of the valid modes (i, o, w, a, r).\n");
+            sendMsg(this->_clientList[i]->_clientFd,"Invalid mode. Please enter one of the valid modes (0, *, i, o, w, a, r).\n");
         }
 
         // Check double username:

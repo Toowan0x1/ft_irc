@@ -158,6 +158,10 @@ void    Server::Join(std::string line, int i) {
                     _clientList[i]->_joined = true;
                     _clientList[i]->_joinedChannel = channelName;
                     std::cout << "~" << _clientList[i]->_nickname << " has been joined " << channelName << std::endl;
+                    _clientList[i]->_joinedChannel = channelName;
+                    /*
+                        user modes
+                    */
 
                     std::string tmp = _hostname + " 001 " + _clientList[i]->_nickname + " :Welcome to the channel! Enjoy your stay.\n";
                     sendMsg(_clientList[i]->_clientFd, tmp);
@@ -190,6 +194,11 @@ void    Server::Join(std::string line, int i) {
                 // if new channel give the client elevated mode/permission on that channel
                 newChannel->_members.push_back(_clientList[i]); // clientList i + 1 - 1
                 std::cout << "~" << _clientList[i]->_nickname << " has been joined " << channelName << std::endl;
+                _clientList[i]->_joinedChannel = channelName;
+                /*
+                    user modes
+                */
+               _clientList[i]->_userMode = "owa";
                 
                 std::string tmp = _hostname + " 001 " + _clientList[i]->_nickname + " :Welcome to the channel! Enjoy your stay.\n";
                 sendMsg(_clientList[i]->_clientFd, tmp);

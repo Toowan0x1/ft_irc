@@ -121,8 +121,6 @@ void    Server::Mode(std::string line, int i)
                                 if (mode[j] == 'i' || mode[j] == 'o' || mode[j] == 'w'
                                     || mode[j] == 'a' || mode[j] == 'r')
                                 {
-                                    // -io
-                                    // wairo
                                     int k = 0;
                                     while (client->_userMode[k])
                                     {
@@ -132,24 +130,22 @@ void    Server::Mode(std::string line, int i)
                                         }
                                         k++;
                                     }
-                                    client->_userMode = tmp;
                                 }
                                 j++;
                             }
+                            client->_userMode = tmp;
                         }
                     }
                     else if (mode[0] == '+')
                     {
-                        std::cout << "+<mode>\n";
                         std::string tmp;
                         if (isValidMode(mode, _clientList[i]->_clientFd))
                         {
-                            while (mode[j]) {
+                            while (mode[j])
+                            {
                                 if (mode[j] == 'i' || mode[j] == 'o' || mode[j] == 'w'
                                     || mode[j] == 'a' || mode[j] == 'r')
                                 {
-                                    // +wa
-                                    // iro
                                     int k = 0;
                                     while (client->_userMode[k]) {
                                         if (client->_userMode[k] != mode[j]) {
@@ -157,10 +153,15 @@ void    Server::Mode(std::string line, int i)
                                         }
                                         k++;
                                     }
-                                    client->_userMode += tmp;
                                 }
                                 j++;
                             }
+                            if (client->_userMode[0] == '0')
+                            {
+                                client->_userMode = tmp;
+                            }
+                            else
+                                client->_userMode += tmp;
                         }
                     }
                     else
@@ -206,6 +207,5 @@ void    Server::Mode(std::string line, int i)
 /*
 MODE nickname +i    // Set invisible mode
 MODE nickname -a    // Unset away mode
-
 MODE nickname       // Query user modes
 */

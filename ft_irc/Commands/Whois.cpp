@@ -60,17 +60,18 @@ void    Server::Whois(std::string line, int i) {
                 if (clientList[i]->_nickname == line.substr(start)) {
                     std::string messageToSend;;
                     messageToSend = "-----------------------------------\n";
-                    messageToSend += "- Real Name:     "   + this->_clientList[i]->_realName  + "\n";
-                    messageToSend += "- Nickname:      "   + this->_clientList[i]->_nickname  + "\n";
-                    messageToSend += "- Username:      "   + this->_clientList[i]->_username  + "\n";
-                    messageToSend += "- User Mode:     "   + this->_clientList[i]->_userMode  + "\n";
-                    messageToSend += "- Hostname:      "   + this->_clientList[i]->_hostname  + "\n";
-                    messageToSend += "- IP Address:    "   + this->_clientList[i]->_IPAddress + "\n";
+                    messageToSend += "- Real Name:      "   + this->_clientList[i]->_realName  + "\n";
+                    messageToSend += "- Nickname:       "   + this->_clientList[i]->_nickname  + "\n";
+                    messageToSend += "- Username:       "   + this->_clientList[i]->_username  + "\n";
+                    messageToSend += "- User Mode:      "   + this->_clientList[i]->_userMode  + "\n";
+                    messageToSend += "- Hostname:       "   + this->_clientList[i]->_hostname  + "\n";
+                    messageToSend += "- IP Address:     "   + this->_clientList[i]->_IPAddress + "\n";
                     std::string authenticated = "No";
                     if (this->_clientList[i]->_authenticated == true) {
                         authenticated = "Yes";
                     }
-                    messageToSend += "- Authenticated: " + authenticated + "\n";
+                    messageToSend += "- Authenticated:  " + authenticated + "\n";
+                    messageToSend += "- Joined Channel: " + this->_clientList[i]->_joinedChannel + "\n";
                     //messageToSend += "|  leaveMsg:\t" + this->_clientList[i]->_leaveMsg + "\t\t\t\t|\n";
                     messageToSend += "-----------------------------------\n";
                     sendMsg(this->_clientList[fddd]->_clientFd, messageToSend);
