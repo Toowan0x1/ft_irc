@@ -185,8 +185,8 @@ void    Server::parse_cmd(std::string line, int i) {
     //     Invite(line, i);
     // else if (startsWith(line, "kick") || startsWith(line, "Kick"))
     //     Kick(line, i);
-    // else if (startsWith(line, "mode") || startsWith(line, "Mode"))
-    //     Mode(line, i);
+    else if (startsWith(line, "mode") || startsWith(line, "Mode"))
+        Mode(line, i);
     // else if (startsWith(line, "msg") || startsWith(line, "Msg"))
     //     Msg(line, i);
     // else if (startsWith(line, "privmsg") || startsWith(line, "Privmsg"))

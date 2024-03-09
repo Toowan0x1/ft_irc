@@ -33,14 +33,16 @@ static void    sendMsg(int fd, std::string msg)
     }
 }
 
-static int hasCharacter(const std::string& str, char ch) {
-    return (str.find(ch) != std::string::npos) ? 1 : 0;
-}
+// static int hasCharacter(const std::string& str, char ch) {
+//     return (str.find(ch) != std::string::npos) ? 1 : 0;
+// }
 
 static int	isValidMode(const std::string& mode, int clientFd)
 {
 	int i = 0;
     int flag = 1;
+    if (mode[0] == '-' || mode[0] == '+')
+        i++;
 	while (mode[i])
 	{
 		if (mode[i] == 'i' || mode[i] == 'o' || mode[i] == 'w'
@@ -49,17 +51,18 @@ static int	isValidMode(const std::string& mode, int clientFd)
             /* do nothing */
         }
 		else {
-			std::string messageToSend = "";
+			std::string messageToSend = "incorrect user mode !\n";
 			sendMsg(clientFd, messageToSend);
             flag = 0;
 			break;
 		}
 		i++;
 	}
+    return flag;
 }
 
-void    Server::Mode(std::string line, int i) {
-    (void)line;
+void    Server::Mode(std::string line, int i)
+{
     int args = countArguments(line);
     if (args > 1 && args < 4) {
         std::stringstream iss(line);
@@ -96,18 +99,20 @@ void    Server::Mode(std::string line, int i) {
         int flag = 0;
         if (args == 3)
         {
+            std::cout << "cmd = " << cmd << " ,arg1 = " << arg1 << " ,mode = " << mode << "\n";
+            //
             std::vector<Client *>::iterator it;
             for (it = _clientList.begin(); it != _clientList.end(); ++it)
             {
                 Client *client = *it;
                 if (client->_nickname == arg1)
                 {
-                    //if (_clientList[i]->_userMode)
                     // check the mode if begin with - or + or one of the user modes iowar
+                    int j = 1;
                     if (mode[0] == '-')
                     {
-                        int j = 1;
                         std::string tmp;
+                        std::cout << "-<mode>\n";
                         // check mode str (improve this part later)
                         if (isValidMode(mode, _clientList[i]->_clientFd))
                         {
@@ -121,7 +126,7 @@ void    Server::Mode(std::string line, int i) {
                                     int k = 0;
                                     while (client->_userMode[k])
                                     {
-                                        if (!client->_userMode[k] == mode[k])
+                                        if (client->_userMode[k] != mode[k])
                                         {
                                             tmp += client->_userMode[k];
                                         }
@@ -133,14 +138,36 @@ void    Server::Mode(std::string line, int i) {
                             }
                         }
                     }
-                    else if (mode[0] == '+' || hasCharacter(mode, 'i') || hasCharacter(mode, 'o')
-                    || hasCharacter(mode, 'w') || hasCharacter(mode, 'a') || hasCharacter(mode, 'r'))
+                    else if (mode[0] == '+')
                     {
-                        //
+                        std::cout << "+<mode>\n";
+                        std::string tmp;
+                        if (isValidMode(mode, _clientList[i]->_clientFd))
+                        {
+                            while (mode[j]) {
+                                if (mode[j] == 'i' || mode[j] == 'o' || mode[j] == 'w'
+                                    || mode[j] == 'a' || mode[j] == 'r')
+                                {
+                                    // +wa
+                                    // iro
+                                    int k = 0;
+                                    while (client->_userMode[k]) {
+                                        if (client->_userMode[k] != mode[j]) {
+                                            tmp += mode[j];
+                                        }
+                                        k++;
+                                    }
+                                    client->_userMode += tmp;
+                                }
+                                j++;
+                            }
+                        }
                     }
                     else
                     {
                         // invalid user mode to set
+                        std::string messageToSend = "incorrect user mode !\n";
+                        sendMsg(_clientList[i]->_clientFd, messageToSend);
                     }
                     flag = 1;
                     break;
@@ -148,7 +175,8 @@ void    Server::Mode(std::string line, int i) {
             }
             if (!flag)
             {
-                std::string messageToSend = "";
+                // nickname username not found 
+                std::string messageToSend = "user ot found !\n";
                 sendMsg(_clientList[i]->_clientFd, messageToSend);
             }
         }
@@ -161,6 +189,7 @@ void    Server::Mode(std::string line, int i) {
                 Client *client = *it;
                 if (client->_nickname == arg1) {
                     std::string messageToSend = "MODE " + arg1 + " " + client->_userMode + "\n";
+                    std::cout << messageToSend;
                     sendMsg(_clientList[i]->_clientFd, messageToSend);
                     flag = 1;
                     break;
