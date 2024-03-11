@@ -13,7 +13,7 @@
 #include "../Include/Server.hpp"
 #include "../Include/Client.hpp"
 #include "../Include/Channel.hpp"
-/*
+
 static int     countArguments(std::string line) {
     std::istringstream iss(line);
     std::string word;
@@ -33,4 +33,23 @@ static void    sendMsg(int fd, std::string msg)
     }
 }
 
-void    // */
+static bool containsChar(const std::string& str, char ch) {
+    for (size_t i = 0; i < str.length(); ++i) {
+        if (str[i] == ch) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void    Server::Kick(std::string line, int i)
+{
+    //if (_clientList[i]->_joinedChannel == )
+    if (!containsChar(_clientList[i]->_userMode, 'o'))
+    {
+        std::string messageToSend = "";
+        sendMsg(_clientList[i]->_clientFd, messageToSend);
+        return;
+    }
+    countArguments(line);
+}

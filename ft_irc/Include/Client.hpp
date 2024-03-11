@@ -75,33 +75,4 @@ public:
     }
 };
 
-Client client;
-client.setChannelMode("#channel1", "+o"); // Set operator mode for channel #channel1
-std::cout << "Mode for #channel1: " << client.getChannelMode("#channel1") << std::endl; // Print mode for #channel1
-client.removeChannelMode("#channel1"); // Remove mode for channel #channel1
-
-
-
-user omar 0 * :omar elhoumadi
-hostname (*) set to: e2r13p2.1337.ma
-Usermode set to: 0
-Username set to: omar
-Realname set to: :omar elhoumadi
-nick toowan
-Nickname set to: toowan
-mode toowan
-MODE toowan 0
-mode toowan +rw
-mode toowan
-MODE toowan rw
-mode toowan +o
-mode toowan
-MODE toowan rwoo
-mode toowan +i
-mode toowan
-MODE toowan rwooiiii
-mode toowan -i
-mode toowan
-MODE toowan rwooiiii
-
 */

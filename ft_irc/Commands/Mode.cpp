@@ -61,10 +61,41 @@ static int	isValidMode(const std::string& mode, int clientFd)
     return flag;
 }
 
+static std::string removeChars(const std::string& original, const std::string& removeChars) {
+    std::string result;
+
+    for (size_t i = 0; i < original.length(); ++i) {
+        // Check if the current character exists in removeChars
+        if (removeChars.find(original[i]) == std::string::npos) {
+            // If not found, append it to the result string
+            result += original[i];
+        }
+    }
+
+    return result;
+}
+
+static  std::string removeDuplicated(std::string& str)
+{
+    std::string result;
+    for (std::string::size_type i = 0; i < str.length(); ++i) {
+        if (result.find(str[i]) == std::string::npos) /////////*****
+            result += str[i];
+    }
+    return result;
+}
+
 void    Server::Mode(std::string line, int i)
 {
+    if (_clientList[i]->_joinedChannel.empty())
+    {
+        std::string messageToSend = "You cannot use MODE command\nJoin a channel to use MODE\n";
+        sendMsg(_clientList[i]->_clientFd, messageToSend);
+        return ;
+    }
+
     int args = countArguments(line);
-    if (args > 1 && args < 4) {
+    if (args == 2 || args == 3) {
         std::stringstream iss(line);
         std::string cmd, arg1, mode;
 
@@ -99,16 +130,12 @@ void    Server::Mode(std::string line, int i)
         int flag = 0;
         if (args == 3)
         {
-            std::cout << "cmd = " << cmd << " ,arg1 = " << arg1 << " ,mode = " << mode << "\n";
-            //
             std::vector<Client *>::iterator it;
             for (it = _clientList.begin(); it != _clientList.end(); ++it)
             {
                 Client *client = *it;
                 if (client->_nickname == arg1)
                 {
-                    // check the mode if begin with - or + or one of the user modes iowar
-                    int j = 1;
                     if (mode[0] == '-')
                     {
                         std::string tmp;
@@ -116,24 +143,10 @@ void    Server::Mode(std::string line, int i)
                         // check mode str (improve this part later)
                         if (isValidMode(mode, _clientList[i]->_clientFd))
                         {
-                            while (mode[j])
-                            {
-                                if (mode[j] == 'i' || mode[j] == 'o' || mode[j] == 'w'
-                                    || mode[j] == 'a' || mode[j] == 'r')
-                                {
-                                    int k = 0;
-                                    while (client->_userMode[k])
-                                    {
-                                        if (client->_userMode[k] != mode[k])
-                                        {
-                                            tmp += client->_userMode[k];
-                                        }
-                                        k++;
-                                    }
-                                }
-                                j++;
-                            }
-                            client->_userMode = tmp;
+                            client->_userMode = removeChars(client->_userMode, mode.substr(1));
+                            std::cout << "tmp=> " << client->_userMode << "\n";
+                            // solve duplicated issue
+                            client->_userMode = removeDuplicated(client->_userMode);
                         }
                     }
                     else if (mode[0] == '+')
@@ -141,27 +154,10 @@ void    Server::Mode(std::string line, int i)
                         std::string tmp;
                         if (isValidMode(mode, _clientList[i]->_clientFd))
                         {
+                            int j = 1;
                             while (mode[j])
-                            {
-                                if (mode[j] == 'i' || mode[j] == 'o' || mode[j] == 'w'
-                                    || mode[j] == 'a' || mode[j] == 'r')
-                                {
-                                    int k = 0;
-                                    while (client->_userMode[k]) {
-                                        if (client->_userMode[k] != mode[j]) {
-                                            tmp += mode[j];
-                                        }
-                                        k++;
-                                    }
-                                }
-                                j++;
-                            }
-                            if (client->_userMode[0] == '0')
-                            {
-                                client->_userMode = tmp;
-                            }
-                            else
-                                client->_userMode += tmp;
+                                client->_userMode += mode[j++];
+                            client->_userMode = removeDuplicated(client->_userMode);
                         }
                     }
                     else
@@ -189,7 +185,17 @@ void    Server::Mode(std::string line, int i)
             for (it = _clientList.begin(); it != _clientList.end(); ++it) {
                 Client *client = *it;
                 if (client->_nickname == arg1) {
-                    std::string messageToSend = "MODE " + arg1 + " " + client->_userMode + "\n";
+                    std::string messageToSend;
+                    if (client->_joinedChannel != _clientList[i]->_joinedChannel)
+                    {
+                        messageToSend = "You cannot query user mode of a user who's not in the same channel as you.\n";
+                        sendMsg(_clientList[i]->_clientFd, messageToSend);
+                        return;
+                    }
+                    if (client->_userMode.empty())
+                        messageToSend = "MODE " + arg1 + " " + "0" + "\n";
+                    else
+                        messageToSend = "MODE " + arg1 + " " + client->_userMode + "\n";
                     std::cout << messageToSend;
                     sendMsg(_clientList[i]->_clientFd, messageToSend);
                     flag = 1;
@@ -198,7 +204,7 @@ void    Server::Mode(std::string line, int i)
             }
             if (!flag)
             {
-                std::string messageToSend = "";
+                std::string messageToSend = "user ot found !\n";
                 sendMsg(_clientList[i]->_clientFd, messageToSend);
             }
         }

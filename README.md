@@ -74,14 +74,14 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 - [x] NICK
 - [x] PASS
 - [x] JOIN
-- [ ] TOPIC
-- [ ] MSG
 - [x] WHO
 - [x] WHOIS
 - [x] LIST
-- [ ] KICK
+- [x] MODE
+- [x] KICK
 - [ ] INVITE
-- [ ] MODE
+- [ ] MSG
+- [ ] TOPIC
 
 ## User Modes
 - https://libera.chat/guides/usermodes

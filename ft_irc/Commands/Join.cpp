@@ -198,7 +198,7 @@ void    Server::Join(std::string line, int i) {
                 /*
                     user modes
                 */
-               _clientList[i]->_userMode = "owa";
+               _clientList[i]->_userMode = "o";
                 
                 std::string tmp = _hostname + " 001 " + _clientList[i]->_nickname + " :Welcome to the channel! Enjoy your stay.\n";
                 sendMsg(_clientList[i]->_clientFd, tmp);
