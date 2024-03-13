@@ -37,6 +37,7 @@ static void    sendMsg(int fd, std::string msg)
 //     return (str.find(ch) != std::string::npos) ? 1 : 0;
 // }
 
+/*
 static int	isValidMode(const std::string& mode, int clientFd)
 {
 	int i = 0;
@@ -48,7 +49,7 @@ static int	isValidMode(const std::string& mode, int clientFd)
 		if (mode[i] == 'i' || mode[i] == 'o' || mode[i] == 'w'
 				|| mode[i] == 'a' || mode[i] == 'r')
 		{
-            /* do nothing */
+            // do nothing
         }
 		else {
 			std::string messageToSend = "incorrect user mode !\n";
@@ -59,7 +60,22 @@ static int	isValidMode(const std::string& mode, int clientFd)
 		i++;
 	}
     return flag;
+}*/
+
+int isValidMode(const std::string& mode, int)
+{
+    if (mode[0] == '-' || mode[0] == '+')
+    {
+        int i = 1; // Start from index 1, assuming index 0 is already checked
+        while (mode[i])
+        {
+            // Your loop logic here
+            ++i; // Increment index
+        }
+    }
+    return 0; // Return something appropriate
 }
+
 
 static std::string removeChars(const std::string& original, const std::string& removeChars) {
     std::string result;
