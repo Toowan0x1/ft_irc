@@ -14,7 +14,6 @@
 #include "../Include/Client.hpp"
 #include "../Include/Channel.hpp"
 
-/*
 static int     countArguments(std::string line) {
     std::istringstream iss(line);
     std::string word;
@@ -34,6 +33,33 @@ static void    sendMsg(int fd, std::string msg)
     }
 }
 
-//
-
-*/
+void    Server::Msg(std::string line, int i)
+{
+    int args = countArguments(line);
+    std::stringstream iss;
+    std::string cmd, arg1, msg;
+    std::string messageToSend;
+    int j = 0;
+    while (iss && j <= args) {
+        if (j == 1)
+            iss >> cmd;
+        else if (j == 2)
+            iss >> arg1;
+        else if (j == 3)
+            iss >> msg;
+        j++;
+    }
+    if (arg1[0] == '#' && arg1 == _clientList[i]->_joinedChannel)
+    {
+        //
+    }
+    else if (arg1[0] != '#')
+    {
+        //
+    }
+    else
+    {
+        // arg1: no channel and no user found with that name
+    }
+    // sendMsg(_clientList[i]->_clientFd, messageToSend);
+}

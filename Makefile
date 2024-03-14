@@ -30,7 +30,7 @@ SRC :=	ft_irc/main.cpp		\
 		ft_irc/Commands/Mode.cpp \
 		ft_irc/Commands/Kick.cpp \
 		ft_irc/Commands/Topic.cpp \
-		# ft_irc/Commands/Msg.cpp \
+		ft_irc/Commands/Msg.cpp \
 		# ft_irc/Commands/Privmsg.cpp \https://github.dev/Toowan0x1/ft_irc/blob/master/Makefile		
 
 # Generate the list of object files based on source files

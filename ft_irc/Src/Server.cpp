@@ -183,16 +183,16 @@ void    Server::parse_cmd(std::string line, int i) {
 
     // else if (startsWith(line, "invite") || startsWith(line, "Invite"))
     //     Invite(line, i);
-    // else if (startsWith(line, "kick") || startsWith(line, "Kick"))
-    //     Kick(line, i);
+    else if (startsWith(line, "kick") || startsWith(line, "Kick"))
+        Kick(line, i);
     else if (startsWith(line, "mode") || startsWith(line, "Mode"))
         Mode(line, i);
-    // else if (startsWith(line, "msg") || startsWith(line, "Msg"))
-    //     Msg(line, i);
+    else if (startsWith(line, "msg") || startsWith(line, "Msg"))
+        Msg(line, i);
     // else if (startsWith(line, "privmsg") || startsWith(line, "Privmsg"))
     //     Privmsg(line, i);
-    // else if (startsWith(line, "topic") || startsWith(line, "Topic"))
-    //     Topic(line, i);
+    else if (startsWith(line, "topic") || startsWith(line, "Topic"))
+        Topic(line, i);
     else if (startsWith(line, "who") || startsWith(line, "Who"))
         Who(line, i);
 
