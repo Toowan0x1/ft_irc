@@ -65,20 +65,19 @@ void    Server::Topic(std::string line, int i)
     if (args == 1)
     {
         // loop on channels
-        std::vector<Channel *>channels;
-        size_t k;
-        for (k = 0; k < channels.size(); ++k)
-        {
-            if (channels[k]->_name == _clientList[i]->_joinedChannel)
-                {std::cout << "found\n";break;}
+        for (std::vector<Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
+            Channel *channel = *it;
+            if (channel->_name == _clientList[i]->_joinedChannel)
+            {
+                std::string messageToSend;
+                if (channel->_topic.empty())
+                    channel->_topic = "'NULL'";
+                messageToSend = _clientList[i]->_joinedChannel + " TOPIC: " + channel->_topic + "\n";
+                std::cout << messageToSend;
+                sendMsg(_clientList[i]->_clientFd, messageToSend);
+                break;
+            }
         }
-        std::cout << _clientList[i]->_joinedChannel << "\n";
-        // std::string messageToSend;
-        // if (channels[k]->_topic.empty())
-        //     channels[k]->_topic = "(NULL)";
-        // messageToSend = _clientList[i]->_joinedChannel + " TOPIC: " + channels[k]->_topic + "\n";
-        // std::cout << messageToSend;
-        // sendMsg(_clientList[i]->_clientFd, messageToSend);
     }
     else if (args == 2)
     {
