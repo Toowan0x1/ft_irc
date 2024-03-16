@@ -14,15 +14,22 @@
 #include "../Include/Client.hpp"
 #include "../Include/Channel.hpp"
 
-//     _nickname(""), // default nickname: "guest_"+${id}
-Client::Client(int &clientFD) :
-    _clientFd(clientFD),
-    _userMode("0"),
-    _authenticated(0),
-    _joined(false),
-    _keepAlive(1)
+void    assignTemporaryNickname(Client *client)
 {
-    /**/
+    if (client->_nickname.empty()) {
+        // Generate a random number between 1000 and 9999
+        srand(time(nullptr));
+        int randomNumber = rand() % 9000 + 1000;
+        // Construct the temporary nickname
+        std::stringstream ss;
+        ss << "guest_" << randomNumber;
+        client->_nickname_tmp = ss.str();
+    }
+}
+//     _nickname(""), // default nickname: "guest_"+${id}
+Client::Client(int &clientFD) : _clientFd(clientFD), _userMode("0"), _authenticated(0), _joined(false), _keepAlive(1)
+{
+    assignTemporaryNickname(this);
 }
 
 Client::~Client() {

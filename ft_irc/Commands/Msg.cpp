@@ -36,7 +36,7 @@ static void    sendMsg(int fd, std::string msg)
 void    Server::Msg(std::string line, int i)
 {
     int args = countArguments(line);
-    std::stringstream iss;
+    std::stringstream iss(line);
     std::string cmd, arg1, msg;
     std::string messageToSend;
     int j = 0;
@@ -51,38 +51,55 @@ void    Server::Msg(std::string line, int i)
     }
     // in case arg1 is a channel
     if (arg1[0] == '#' || arg1 == _clientList[i]->_joinedChannel)
+    //if (arg1 == _clientList[i]->_joinedChannel || arg1.compare(_clientList[i]->_joinedChannel) == 0)
     {
         // while loop on memebers and send msg to all of them (from -> to)
-        std::vector<Channel *>channels;
-        size_t k;
-        for (k = 0; k < channels.size(); ++k)
+        bool channelFound = false;
+        for (std::vector<Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it)
         {
-            if (channels[k]->_name == arg1)
+            Channel *channel = *it;
+            if (channel->_name == arg1)
+            {
+                channelFound = true;
+                size_t l = 0;
+                while (l < channel->_members.size())
+                {
+                    messageToSend = ":" + _clientList[i]->_nickname + " MSG " + channel->_name + " :" + msg + "\n";
+                    //std::cout << channel->_members[l]->_nickname << "\n";
+                    sendMsg(channel->_members[l]->_clientFd, messageToSend);
+                    l++;
+                }
                 break;
+            }
         }
-        size_t l;
-        std::cout << "channel: " << channels[k] << "\n";
-        std::cout << "cmd: " << cmd << "\n";
-        std::cout << "arg: " << arg1 << "\n";
-        std::cout << "msg: " << msg << "\n";
-        for (l = 0; channels[k]->_members.size(); ++l)
+        if (!channelFound)
         {
-            messageToSend = ":" + _clientList[i]->_nickname + " MSG " + channels[k]->_name + ":" + msg + "\n";
-            std::cout << channels[k]->_members[l]->_nickname << "\n";
-            sendMsg(channels[k]->_members[l]->_clientFd, messageToSend);
+            messageToSend = "Error: No channel found with the name '" + arg1 + "'!";
+            sendMsg(_clientList[i]->_clientFd, messageToSend);
         }
     }
-    // in case arg1 is a member
-    else if (arg1[0] != '#')
+
+    // in case arg1 is a client member
+    else if (!arg1.empty())
     {
         // check that user and check if is in the channel
-        
-        //messageToSend = ":" + _clientList[i]->_nickname + " MSG " + channels[k]->_name + ":" + msg + "\n";
-        //sendMsg(channels[k]->_members[l]->_clientFd, messageToSend);
+        bool clientFound = false;
+        std::vector<Client *>::iterator it;
+        for (it = _clientList.begin(); it != _clientList.end(); ++it) {
+            Client *client = *it;
+            if (client->_nickname == arg1) {
+                clientFound = true;
+                messageToSend = ":" + _clientList[i]->_nickname + " MSG " + client->_nickname + " :" + msg + "\n";
+                sendMsg(client->_clientFd, messageToSend);
+                break;
+            }
+        }
+        if (!clientFound)
+        {
+            messageToSend = "Error: No user found with the name '" + arg1 + "'!";
+            sendMsg(_clientList[i]->_clientFd, messageToSend);
+        }
     }
-    else
-    {
-        // arg1: no channel and no user found with that name
-    }
-    // sendMsg(_clientList[i]->_clientFd, messageToSend);
 }
+
+// msg makaymchich arg kaml ?

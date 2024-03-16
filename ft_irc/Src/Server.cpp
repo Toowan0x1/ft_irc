@@ -46,6 +46,30 @@ void Server::removeClientFromChannels(Client *client) {
 }
 
 void    Server::handleDisconnection(int i) {
+    // if empty nickname
+    // ... give it guest+index
+
+    i = i - 1; // because i = 1 and the index of clients starts from 0
+
+    std::string user;
+    if (this->_clientList[i]->_nickname.empty())
+        user = this->_clientList[i]->_nickname_tmp;
+    else
+        user = this->_clientList[i]->_nickname;
+
+    // 
+    int fd = this->_pfds[i + 1].fd;
+    std::cout << "[-] Client ~" << user << " has been disconnected!" << std::endl;
+    delete this->_clientList[i];
+    this->_clientList.erase(this->_clientList.begin() + i);
+    this->_pfds.erase(this->_pfds.begin() + i + 1);
+    removeClientFromChannels(this->_clientList[i]);
+    close(fd);
+    //std::cout << " └─ ~" << user << ": CLIENT DELETED" << std::endl;
+    std::cout << " └─ CLIENT DELETED" << std::endl;
+}
+/*
+void    Server::handleDisconnection(int i) {
     i = i - 1; // because i = 1 and the index of clients starts from 0
     int fd = this->_pfds[i + 1].fd;
     delete this->_clientList[i];
@@ -53,9 +77,10 @@ void    Server::handleDisconnection(int i) {
     this->_pfds.erase(this->_pfds.begin() + i + 1);
     removeClientFromChannels(this->_clientList[i]);
     close(fd);
-    std::cout << "~" << this->_clientList[i]->_nickname << " has been disconnected" << std::endl;
+    std::cout << "[SERVER] Client ~" << this->_clientList[i]->_nickname << " has been disconnected!" << std::endl;
+    std::cout << "~" << _clientList[i]->_nickname << ": DELETED"<< _clientList[i]->_nickname << std::endl;
 }
-
+*/
 void    Server::handleNewConnection()
 {
     struct sockaddr_in clientAddr;
@@ -87,7 +112,14 @@ void    Server::handleNewConnection()
         my_client->_hostname = hostbuffer;
     /* == == == == == == == == == == == == == == */
     this->_clientList.push_back(my_client);
-    std::cout << "[+] New Client Connected, (IP=" << my_client->_IPAddress << ", HOST=" << my_client->_hostname << ")" << std::endl;
+    
+    std::string user;
+    if (my_client->_nickname.empty())
+        user = my_client->_nickname_tmp;
+    else
+        user = my_client->_nickname;
+    std::cout << "[+] New Client ~" << user << " Connected, (IP=" << my_client->_IPAddress << ", HOST=" << my_client->_hostname << ")" << std::endl;
+    std::cout << " └─ CLIENT REGISTRED" << std::endl;
 }
 
 void    Server::setServerSocket()
@@ -281,8 +313,8 @@ Server::Server(std::string port, std::string password) {
     if (this->_port == 0 || (this->_port < 0 || this->_port > 65535))
         throw std::runtime_error("Invalid port");
     this->_password = password;
-    if (!(this->_password.length() >= 8 && this->_password.length() <= 16))
-        throw std::runtime_error("Invalid password");
+    //if (!(this->_password.length() >= 8 && this->_password.length() <= 16))
+        //throw std::runtime_error("Invalid password");
 }
 
 Server::~Server() {

@@ -23,6 +23,7 @@ class   Client {
         struct sockaddr_in  _addr;
         std::string _username;
         std::string _nickname;
+        std::string _nickname_tmp;
         std::string _realName;
         std::string _userMode;
         std::string _IPAddress;

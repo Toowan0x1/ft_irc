@@ -53,8 +53,8 @@ void    Server::Nick(std::string line, int i) {
                 isDuplicated = true;
                 // what if ur nickname same as the one you are providing in the cmd
                 // handle msg: "nickname already used by client(*)"
-                std::string msggggg = "~" + arg2 + " nickname is registred. Please choose a different nickname.\n";
-                sendMsg(_clientList[i]->_clientFd, msggggg);
+                std::string messageToSend = "~" + arg2 + " nickname is registred. Please choose a different nickname.\n";
+                sendMsg(_clientList[i]->_clientFd, messageToSend);
                 break ;
             }
             t++;
@@ -62,8 +62,9 @@ void    Server::Nick(std::string line, int i) {
         if (isDuplicated != true)
         {
             _clientList[i]->_nickname = arg2;
-            std::string msg = "Nickname set to: " + arg2 + "\n";
-            sendMsg(_clientList[i]->_clientFd, msg);
+            std::string messageToSend = "Nickname set to: " + arg2 + "\n";
+            sendMsg(_clientList[i]->_clientFd, messageToSend);
+            std::cout << "[SERVER] ~" << _clientList[i]->_nickname_tmp << " changed his nickname to ~" << _clientList[i]->_nickname << std::endl;
         }
     }
 }
