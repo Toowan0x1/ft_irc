@@ -49,13 +49,36 @@ void    Server::Msg(std::string line, int i)
             iss >> msg;
         j++;
     }
-    if (arg1[0] == '#' && arg1 == _clientList[i]->_joinedChannel)
+    // in case arg1 is a channel
+    if (arg1[0] == '#' || arg1 == _clientList[i]->_joinedChannel)
     {
-        //
+        // while loop on memebers and send msg to all of them (from -> to)
+        std::vector<Channel *>channels;
+        size_t k;
+        for (k = 0; k < channels.size(); ++k)
+        {
+            if (channels[k]->_name == arg1)
+                break;
+        }
+        size_t l;
+        std::cout << "channel: " << channels[k] << "\n";
+        std::cout << "cmd: " << cmd << "\n";
+        std::cout << "arg: " << arg1 << "\n";
+        std::cout << "msg: " << msg << "\n";
+        for (l = 0; channels[k]->_members.size(); ++l)
+        {
+            messageToSend = ":" + _clientList[i]->_nickname + " MSG " + channels[k]->_name + ":" + msg + "\n";
+            std::cout << channels[k]->_members[l]->_nickname << "\n";
+            sendMsg(channels[k]->_members[l]->_clientFd, messageToSend);
+        }
     }
+    // in case arg1 is a member
     else if (arg1[0] != '#')
     {
-        //
+        // check that user and check if is in the channel
+        
+        //messageToSend = ":" + _clientList[i]->_nickname + " MSG " + channels[k]->_name + ":" + msg + "\n";
+        //sendMsg(channels[k]->_members[l]->_clientFd, messageToSend);
     }
     else
     {

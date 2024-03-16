@@ -80,8 +80,9 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 - [x] MODE
 - [x] KICK
 - [x] TOPIC
+- [x] MSG
+- [ ] Leave
 - [ ] INVITE
-- [ ] MSG
 
 ## User Modes
 - https://libera.chat/guides/usermodes

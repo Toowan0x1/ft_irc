@@ -70,11 +70,15 @@ void    Server::Topic(std::string line, int i)
         for (k = 0; k < channels.size(); ++k)
         {
             if (channels[k]->_name == _clientList[i]->_joinedChannel)
-                break;
+                {std::cout << "found\n";break;}
         }
-        std::string messageToSend;
-        messageToSend = _clientList[i]->_joinedChannel + " TOPIC: " + channels[k]->_topic + "\n";
-        sendMsg(_clientList[i]->_clientFd, messageToSend);
+        std::cout << _clientList[i]->_joinedChannel << "\n";
+        // std::string messageToSend;
+        // if (channels[k]->_topic.empty())
+        //     channels[k]->_topic = "(NULL)";
+        // messageToSend = _clientList[i]->_joinedChannel + " TOPIC: " + channels[k]->_topic + "\n";
+        // std::cout << messageToSend;
+        // sendMsg(_clientList[i]->_clientFd, messageToSend);
     }
     else if (args == 2)
     {
