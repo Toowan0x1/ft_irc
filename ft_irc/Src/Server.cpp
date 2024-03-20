@@ -230,6 +230,8 @@ void    Server::parse_cmd(std::string line, int i) {
 
     else if (startsWith(line, "whois") || startsWith(line, "WHOIS"))
         Whois(line, i);
+    else if (startsWith(line, "send") || startsWith(line, "Send"))
+        Send(line, i);
     // realname  _buffer
 }
 

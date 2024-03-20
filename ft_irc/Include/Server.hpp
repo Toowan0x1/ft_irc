@@ -66,6 +66,7 @@ class Server {
         void    Who(std::string line, int clientFd);
         void    Whois(std::string line, int clientFd);
         void    Msg(std::string line, int clientFd);
+        void    Send(std::string line, int clientFd);
         // void    Privmsg(std::string line, int clientFd);
         // void    Invite(std::string line, int clientFd);
         

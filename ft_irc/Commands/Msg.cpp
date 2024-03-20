@@ -41,12 +41,18 @@ void    Server::Msg(std::string line, int i)
     std::string messageToSend;
     int j = 0;
     while (iss && j <= args) {
-        if (j == 1)
-            iss >> cmd;
-        else if (j == 2)
-            iss >> arg1;
-        else if (j == 3)
-            iss >> msg;
+        std::string word;
+        iss >> word;
+        if (j == 0)
+            cmd = word;
+        else if (j == 1)
+            arg1 = word;
+        else if (j >= 2)
+        {
+            if (!msg.empty())
+                msg += " ";
+            msg += word;
+        }
         j++;
     }
     // in case arg1 is a channel

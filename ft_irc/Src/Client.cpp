@@ -18,7 +18,8 @@ void    assignTemporaryNickname(Client *client)
 {
     if (client->_nickname.empty()) {
         // Generate a random number between 1000 and 9999
-        srand(time(nullptr));
+        //srand(time(nullptr));
+        srand(time(NULL));
         int randomNumber = rand() % 9000 + 1000;
         // Construct the temporary nickname
         std::stringstream ss;

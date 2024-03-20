@@ -110,7 +110,6 @@ void    Server::Join(std::string line, int i) {
 
         // channel names MUST start with #
         if (channelName[0] == '#') {
-            // Check if the channel already exists
             // check the channel if already exists
             Channel *joinedChannel = NULL;
             std::vector<Channel *>::iterator it;
@@ -220,21 +219,3 @@ void    Server::Join(std::string line, int i) {
         sendMsg(_clientList[i]->_clientFd, message);
     }
 }
-
-/*
-// msg #channel msg
-// msg ~nickname msg
-// quit or exit a channel (quit :Leaving)
--------
-    banana
-    [client->server]
-    [client->server]:toowan@0 JOIN #seclab
-    // if user disconnected o dar connect next time, kaytra mochkil dyal double userNIckname
-*/
-
-
-/* 
-                    * represents the user's nickname (or in the case of 431,
-                    a wildcard to indicate that no nickname was given),
-                    and #channel represents the channel the user attempted to join.
-                */
