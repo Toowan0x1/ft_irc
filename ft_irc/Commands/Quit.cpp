@@ -76,18 +76,25 @@ void    Server::Quit(std::string line, int i) {
             j++;
         }
     }
-    std::cout << "0 >>" << this->_clientList[0]->_nickname << "\n";
-    std::cout << "1 >>" << this->_clientList[1]->_nickname << "\n";
+    //std::cout << "0 >>" << this->_clientList[0]->_nickname << "\n";
+    //std::cout << "1 >>" << this->_clientList[1]->_nickname << "\n";
     _clientList[i]->_joined = false;
+    _clientList[i]->_joinedChannel = "";
+    std::string user;
+    if (this->_clientList[i]->_nickname.empty())
+        user = this->_clientList[i]->_nickname_tmp;
+    else
+        user = this->_clientList[i]->_nickname;
     int fd = this->_pfds[i + 1].fd;
+    std::cout << "[-] Client ~" << user << " has been disconnected!" << std::endl;
     delete this->_clientList[i];
     this->_clientList.erase(this->_clientList.begin() + i);
     this->_pfds.erase(this->_pfds.begin() + i);
     close(fd);
-    std::cout << "~" << this->_clientList[i]->_nickname << " has been disconnected" << std::endl;
-    std::cout << "0 >>" << this->_clientList[0]->_nickname << "\n";
-    std::cout << "1 >>" << this->_clientList[1]->_nickname << "\n";
+    //std::cout << "0 >>" << this->_clientList[0]->_nickname << "\n";
+    //std::cout << "1 >>" << this->_clientList[1]->_nickname << "\n";
     // removeclient from chqnnel
+    std::cout << " └─ CLIENT DELETED" << std::endl;
 }
 
 /*

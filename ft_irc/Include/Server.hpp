@@ -67,6 +67,7 @@ class Server {
         void    Whois(std::string line, int clientFd);
         void    Msg(std::string line, int clientFd);
         void    Send(std::string line, int clientFd);
+        void    Leave(std::string line, int clientFd);
         // void    Privmsg(std::string line, int clientFd);
         // void    Invite(std::string line, int clientFd);
         
@@ -77,6 +78,7 @@ class Server {
         void    handleDisconnection(int i);
         int     countChannelMembers(std::string channelName);
 
+        std::string getClientHostName(Client *client);
         
 };
 // clientPfds

@@ -81,7 +81,8 @@ IRC (Internet Relay Chat) clients are applications that facilitate communication
 - [x] KICK
 - [x] TOPIC
 - [x] MSG
-- [ ] Leave
+- [x] Leave
+- [x] Send
 - [ ] INVITE
 
 ## Remarque :

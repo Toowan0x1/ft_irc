@@ -24,17 +24,18 @@ static int     countArguments(std::string line) {
     return (count);
 }
 
-// static void    sendMsg(int fd, std::string msg)
-// {
-//     const char *_msg = msg.c_str();
-//     size_t msgSize = strlen(_msg);
-//     if (send(fd, _msg, msgSize, 0) < 0) {
-//         std::cout << "send failed" << std::endl;
-//     }
-// }
+static void    sendMsg(int fd, std::string msg)
+{
+    const char *_msg = msg.c_str();
+    size_t msgSize = strlen(_msg);
+    if (send(fd, _msg, msgSize, 0) < 0) {
+        std::cout << "send failed" << std::endl;
+    }
+}
 
 void    Server::Who(std::string line, int i) {
-    (void)i;
+    //(void)i;
+    i = i;
     int args = countArguments(line);
     if (args > 1) {
         std::stringstream iss(line);
@@ -50,13 +51,16 @@ void    Server::Who(std::string line, int i) {
                 iss >> channel; // Channel
             j++;
         }
-        for (size_t i = 0; i < _channels.size(); ++i) {
-            if (channel == _channels[i]->_name)
+        std::string messageToSend;
+        for (size_t k = 0; k < _channels.size(); ++k) {
+            if (channel == _channels[k]->_name)
             {
-                std::vector<Client *> members = _channels[i]->_members;
-                for (size_t j = 0; j < members.size(); ++j) {
+                std::vector<Client *> members = _channels[k]->_members;
+                for (size_t l = 0; l < members.size(); ++l) {
                     // Do something with each member
-                    std::cout << "Channel: " << _channels[i]->_name << ", Member: " << members[j]->_username << std::endl;
+                    messageToSend = "Channel: " + _channels[k]->_name + ", Member: " + members[l]->_username + "\n";
+                    //std::cout << messageToSend << std::endl;
+                    sendMsg(_clientList[i]->_clientFd, messageToSend);
                 }
             }
         }

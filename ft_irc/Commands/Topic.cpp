@@ -101,22 +101,26 @@ void    Server::Topic(std::string line, int i)
             sendMsg(_clientList[i]->_clientFd, messageToSend);
             return;
         }
+        std::cout << "bypassed\n";
         // loop on channels
-        std::vector<Channel *> channels;
-        for (size_t k = 0; k < channels.size(); ++k) {
-            if (channels[k]->_name == _clientList[i]->_joinedChannel)
+        std::vector<Channel *>::iterator it;
+        //for (size_t k = 0; k < channels.size(); ++k) {
+        for (it = _channels.begin(); it != _channels.end(); ++it) {
+            Channel *channel = *it;
+            if (channel->_name == _clientList[i]->_joinedChannel)
             {
-                channels[k]->_topic = topic;
+                std::cout << channel->_name << "\n";
+                channel->_topic = topic;
                 // server output :
-                std::cout << "[" + channels[k]->_name + "] Topic changed -> " + topic + "\n";
+                std::cout << "[" + channel->_name + "] Topic changed -> " + topic + "\n";
                 sendMsg(_clientList[i]->_clientFd, messageToSend);
                 // inform channel members
                 size_t l = 0;
-                while (channels[k]->_members[l])
+                while (channel->_members[l])
                 {
                     // :<server> 332 <nick> <channel> :<new_topic>
-                    messageToSend = ":" + this->_hostname + " 332 " + this->_clientList[i]->_nickname + " " + channels[k]->_name + " :" + topic + "\n";
-                    sendMsg(channels[k]->_members[l]->_clientFd, messageToSend);
+                    messageToSend = ":" + this->_hostname + " 332 " + this->_clientList[i]->_nickname + " " + channel->_name + " :" + topic + "\n";
+                    sendMsg(channel->_members[l]->_clientFd, messageToSend);
                     l++;
                 }
             }

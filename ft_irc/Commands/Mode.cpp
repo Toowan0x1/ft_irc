@@ -212,7 +212,6 @@ void    Server::Mode(std::string line, int i)
                         messageToSend = "MODE " + arg1 + " " + "0" + "\n";
                     else
                         messageToSend = "MODE " + arg1 + " " + client->_userMode + "\n";
-                    std::cout << messageToSend;
                     sendMsg(_clientList[i]->_clientFd, messageToSend);
                     flag = 1;
                     break;

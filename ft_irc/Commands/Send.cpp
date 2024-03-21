@@ -57,9 +57,9 @@ static void    sendMsg(int fd, std::string msg)
 
 void	Server::Send(std::string line, int i)
 {
-    std::cout << "SEND [ " << line << " ]\n";
 	int args = countArguments(line);
-    std::string cmd, nickname, fileToSend;
+    std::string cmd, arg1, fileToSend;
+    std::string messageToSend;
     int j = 0;
     std::stringstream iss(line);
     (void)i;
@@ -69,17 +69,23 @@ void	Server::Send(std::string line, int i)
         if (j == 1)
             iss >> cmd;     // Command
         else if (j == 2)
-            iss >> nickname;   // nickname
+            iss >> arg1;   // nickname or channel
         else if (j == 3)
             iss >> fileToSend;   // fileToSend
         j++;
     }
-    //fileToSend = "Makefile";
-    std::string filePath = "/home/toowan/Desktop/ft_irc/" + fileToSend;
 
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        sendMsg(_clientList[i]->_clientFd, "Error: Unable to get current working directory.\n");
+        return;
+    }
+    std::string currentPath(cwd);
+    std::string filePath = currentPath + "/" + fileToSend;
+    std::cout << filePath << std::endl;
     std::ifstream file(filePath.c_str(), std::ios::binary);
     if (!file.is_open()) {
-        std::cerr << "Error: Failed to open file for reading." << std::endl;
+        sendMsg(_clientList[i]->_clientFd, "Error: Failed to open file for reading: " + filePath + "/" + ".\n");
         return;
     }
 
@@ -91,19 +97,71 @@ void	Server::Send(std::string line, int i)
     // Convert file content to string
     std::string fileContentStr = fileContent.str();
 
-    // Encode file content in Base64
-    //std::string base64EncodedContent = base64Encode(fileContentStr);
-
-    // Construct the IRC message
-    std::string message = "PRIVMSG nickname :" + fileContentStr;
-
-    // Send the file content to the client
-    ssize_t bytesSent = send(_clientList[0]->_clientFd, fileContentStr.c_str(), fileContentStr.size(), 0);
-    if (bytesSent == -1) {
-        std::cerr << "Error: Failed to send file to client." << std::endl;
-        return;
+    // in case arg1 is a channel
+    if (arg1[0] == '#' || arg1 == _clientList[i]->_joinedChannel)
+    {
+        //
+        bool channelFound = false;
+        for (std::vector<Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+        {
+            Channel *channel = *it;
+            if (channel->_name == arg1)
+            {
+                channelFound = true;
+                size_t l = 0;
+                while (l < channel->_members.size())
+                {
+                    messageToSend = ":" + _clientList[i]->_nickname + " MSG " + channel->_name + " :" + fileContentStr + "\n";
+                    ssize_t bytesSent = send(channel->_members[l]->_clientFd, fileContentStr.c_str(), fileContentStr.size(), 0);
+                    if (bytesSent == -1) {
+                        sendMsg(_clientList[i]->_clientFd, "Error: Failed to send file to client.\n");
+                        return;
+                    }
+                    l++;
+                }
+                sendMsg(_clientList[i]->_clientFd, "File sent successfully.\n");
+                break;
+            }
+        }
+        if (!channelFound)
+        {
+            messageToSend = "Error: No channel found with the name '" + arg1 + "'!";
+            sendMsg(_clientList[i]->_clientFd, messageToSend);
+        }
     }
 
-    sendMsg(_clientList[i]->_clientFd, "File sent successfully.\n");
+    // in case arg1 is a client member
+    else if (!arg1.empty())
+    {
+        // check that user and check if is in the channel
+        bool clientFound = false;
+        std::vector<Client *>::iterator it;
+        for (it = _clientList.begin(); it != _clientList.end(); ++it) {
+            Client *client = *it;
+            if (client->_nickname == arg1) {
+                clientFound = true;
+                messageToSend = ":" + _clientList[i]->_nickname + " MSG " + client->_nickname + " :" + fileContentStr + "\n";
+                ssize_t bytesSent = send(client->_clientFd, fileContentStr.c_str(), fileContentStr.size(), 0);
+                if (bytesSent == -1) {
+                    sendMsg(_clientList[i]->_clientFd, "Error: Failed to send file to client.\n");
+                    return;
+                }
+                sendMsg(_clientList[i]->_clientFd, "File sent successfully.\n");
+                break;
+            }
+        }
+        if (!clientFound)
+        {
+            messageToSend = "Error: No user found with the name '" + arg1 + "'!";
+            sendMsg(_clientList[i]->_clientFd, messageToSend);
+        }
+    }
+
+
+    /////////
+
+    
+
+    
 }
 

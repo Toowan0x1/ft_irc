@@ -81,6 +81,54 @@ void    Server::handleDisconnection(int i) {
     std::cout << "~" << _clientList[i]->_nickname << ": DELETED"<< _clientList[i]->_nickname << std::endl;
 }
 */
+
+static void    sendMsg(int fd, std::string msg)
+{
+    const char *_msg = msg.c_str();
+    size_t msgSize = strlen(_msg);
+    if (send(fd, _msg, msgSize, 0) < 0) {
+        std::cout << "send failed" << std::endl;
+    }
+}
+
+// Function to get the hostname from a given IP address
+std::string Server::getClientHostName(Client *client) {
+    struct hostent *hostEntry;
+    struct in_addr addr;
+    
+    std::string message;
+    message = ":";
+    message += this->_hostname;
+    message += " NOTICE * :*** Looking up your hostname...\n";
+    //std::cout << message << std::endl;
+    sendMsg(client->_clientFd, message);
+
+    // Convert IP address from text to binary form
+    if (!inet_aton(client->_IPAddress.c_str(), &addr)) {
+        // throw std::runtime_error("Error retrieving hostname for the IP address.");
+    }
+
+    // Get host entry corresponding to the IP address
+    hostEntry = gethostbyaddr(&addr, sizeof(addr), AF_INET);
+    if (hostEntry == NULL) {
+        message = ":";
+        message += this->_hostname;
+        message += " NOTICE * :*** ";
+        message += "Could not resolve your hostname: Domain not found; using your IP address () instead.\n";
+        sendMsg(client->_clientFd, message);
+    }
+    message = ":";
+    message += this->_hostname;
+    message += " NOTICE * :*** ";
+    message += "Hostname resolved: [" + std::string(hostEntry->h_name) + "]." + ".\n";
+    sendMsg(client->_clientFd, message);
+
+    return std::string(hostEntry->h_name);
+}
+/*
+:irc.host.com NOTICE * :*** Looking up your hostname...
+*/
+
 void    Server::handleNewConnection()
 {
     struct sockaddr_in clientAddr;
@@ -102,17 +150,16 @@ void    Server::handleNewConnection()
     pfd.events = POLLIN;
     pfd.revents = 0;
     this->_pfds.push_back(pfd);
-
+    /* == == == == == == == == == == == == == == */  
     Client *my_client = new Client(clientSocketFd);
     my_client->_IPAddress = inet_ntoa(clientAddr.sin_addr);
-    /* make this peice of code in single function */
-    char hostbuffer[256];
-    int hostname = gethostname(hostbuffer, sizeof(hostbuffer));
-    if (hostname != -1)
-        my_client->_hostname = hostbuffer;
-    /* == == == == == == == == == == == == == == */
+    try {
+        my_client->_hostname = getClientHostName(my_client);
+    } catch (const std::exception& e) {
+        std::cerr << "Error getting client hostname: " << e.what() << std::endl;
+    }
     this->_clientList.push_back(my_client);
-    
+    /* == == == == == == == == == == == == == == */    
     std::string user;
     if (my_client->_nickname.empty())
         user = my_client->_nickname_tmp;
@@ -190,16 +237,6 @@ int     countArguments(std::string line) { // countCommandArgs
 
 void    Server::parse_cmd(std::string line, int i) {
     i = i - 1; // because i = 1 and the index of clients starts from 0
-    //std::cout << "clientFd=" << i << std::endl;
-    // this->_clientList[i]->_buffer = line;
-    // std::cout << 0 << ":" << _clientList[i]->_buffer << std::endl;
-    // std::cout << "%" << line << "%" << std::endl;
-    // if (startsWith(line, "connect") || startsWith(line, "CONNECT")) {
-    //     //std::cout << "yes> " << line << std::endl;
-    // }
-    // else if (startsWith(line, "server") || startsWith(line, "SERVER")) {
-    //     /**/
-    // }
     if (startsWith(line, "pass") || startsWith(line, "PASS"))
         Pass(line, i);
     else if (startsWith(line, "nick") || startsWith(line, "NICK"))
@@ -212,7 +249,6 @@ void    Server::parse_cmd(std::string line, int i) {
         Quit(line, i);
     else if (startsWith(line, "list") || startsWith(line, "LIST"))
         List(line, i);
-
     // else if (startsWith(line, "invite") || startsWith(line, "Invite"))
     //     Invite(line, i);
     else if (startsWith(line, "kick") || startsWith(line, "Kick"))
@@ -221,22 +257,19 @@ void    Server::parse_cmd(std::string line, int i) {
         Mode(line, i);
     else if (startsWith(line, "msg") || startsWith(line, "Msg"))
         Msg(line, i);
-    // else if (startsWith(line, "privmsg") || startsWith(line, "Privmsg"))
-    //     Privmsg(line, i);
     else if (startsWith(line, "topic") || startsWith(line, "Topic"))
         Topic(line, i);
     else if (startsWith(line, "who") || startsWith(line, "Who"))
         Who(line, i);
-
     else if (startsWith(line, "whois") || startsWith(line, "WHOIS"))
         Whois(line, i);
     else if (startsWith(line, "send") || startsWith(line, "Send"))
         Send(line, i);
-    // realname  _buffer
+    else if (startsWith(line, "leave") || startsWith(line, "Leave"))
+        Leave(line, i);
 }
 
 void    Server::AcceptMsg(int i) {
-    // use client buffer instead
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
 
@@ -365,7 +398,4 @@ std::vector<std::string> split(const std::string &s, char delimiter) {
 */
 
 
-/*
-:irc.host.com NOTICE * :*** Looking up your hostname...
-:irc.host.com NOTICE * :*** Could not resolve your hostname: Domain not found; using your IP address () instead.
-*/
+
