@@ -45,6 +45,7 @@ class Server {
         std::vector<pollfd>     _pfds; // Managing communication with multiple clients or channels concurrently.
         std::vector<Client *>   _clientList;
         std::vector<Channel *>  _channels; // channelList;
+        // std::vector<Channel>    _channelObjects;
     public:
         Server(std::string port, std::string password);
         void    start();
@@ -79,7 +80,32 @@ class Server {
         int     countChannelMembers(std::string channelName);
 
         std::string getClientHostName(Client *client);
-        
+
+        void bot(Client *client);
+
+        //void    Server::removeMemberFromChannel(const std::string &channelName, const std::string& nickname);
+
+
+        // // Channel Class
+        // class   Channel {
+        //     public:
+        //         std::string _name;
+        //         std::string _pass;
+        //         std::string _topic;
+        //         bool    hasPassword;
+        //         std::vector<Client *> _members;
+        //         Channel();
+        //         Channel(std::string channel);
+        //         ~Channel();
+        //         void    removeMember(const std::string& nickname);
+
+
+        //         Channel::Channel() {/**/}
+        //         Channel::Channel(std::string channelName) : _name(channelName)
+        //         {
+        //             /**/ //(void)channelName;
+        //         }
+        // };     
 };
 // clientPfds
 // serverPfd

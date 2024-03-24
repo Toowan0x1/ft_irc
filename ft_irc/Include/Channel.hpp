@@ -27,6 +27,7 @@ class   Channel {
         Channel();
         Channel(std::string channel);
         ~Channel();
+        void    removeMember(const std::string& nickname);
 };
 
 #endif

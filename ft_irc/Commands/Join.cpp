@@ -207,7 +207,7 @@ void    Server::Join(std::string line, int i) {
                 std::vector<Client *>::iterator it;
                 for (it = newChannel->_members.begin(); it != newChannel->_members.end(); it++)
                 {
-                    std::string message = channelName + " :New user " + _clientList[i]->_username + " has joined the channel.\n";
+                    std::string message = channelName + " :New user '~" + _clientList[i]->_username + "' has joined the channel.\n";
                     if ((*it)->_clientFd != _clientList[i]->_clientFd)
                         sendMsg((*it)->_clientFd, message);
                 }

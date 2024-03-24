@@ -167,6 +167,7 @@ void    Server::handleNewConnection()
         user = my_client->_nickname;
     std::cout << "[+] New Client ~" << user << " Connected, (IP=" << my_client->_IPAddress << ", HOST=" << my_client->_hostname << ")" << std::endl;
     std::cout << " └─ CLIENT REGISTRED" << std::endl;
+    bot(my_client);
 }
 
 void    Server::setServerSocket()
