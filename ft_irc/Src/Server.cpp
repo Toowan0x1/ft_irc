@@ -258,6 +258,8 @@ void    Server::parse_cmd(std::string line, int i) {
         Mode(line, i);
     else if (startsWith(line, "msg") || startsWith(line, "Msg"))
         Msg(line, i);
+    else if (startsWith(line, "privmsg") || startsWith(line, "Privmsg"))
+        Msg(line, i);
     else if (startsWith(line, "topic") || startsWith(line, "Topic"))
         Topic(line, i);
     else if (startsWith(line, "who") || startsWith(line, "Who"))

@@ -189,7 +189,7 @@ void    Server::Mode(std::string line, int i)
             if (!flag)
             {
                 // nickname username not found 
-                std::string messageToSend = "user ot found !\n";
+                std::string messageToSend = "user '~" + arg1 + "'not found !\n";
                 sendMsg(_clientList[i]->_clientFd, messageToSend);
             }
         }

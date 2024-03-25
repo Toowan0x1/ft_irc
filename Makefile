@@ -31,6 +31,7 @@ SRC :=	ft_irc/main.cpp		\
 		ft_irc/Commands/Kick.cpp \
 		ft_irc/Commands/Topic.cpp \
 		ft_irc/Commands/Msg.cpp \
+		ft_irc/Commands/Privmsg.cpp \
 		ft_irc/Commands/Send.cpp \
 		ft_irc/Commands/Leave.cpp \
 		Bot.cpp \

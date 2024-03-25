@@ -56,7 +56,7 @@ void    Server::Join(std::string line, int i) {
             if (_clientList[i]->_joined == true)
             {
                 std::string messageToSend;
-                messageToSend = _hostname + " NOTICE " + _clientList[i]->_nickname + " You are already in a channel. You cannot join another one.\n";
+                messageToSend = _hostname + " NOTICE " + _clientList[i]->_nickname + "You are already in a channel. You cannot join another one.\n";
                 sendMsg(_clientList[i]->_clientFd, messageToSend);
                 messageToSend = _hostname + " NOTICE " + _clientList[i]->_nickname + " Leave this channel in order to join another one.\n";
                 sendMsg(_clientList[i]->_clientFd, messageToSend);
@@ -170,13 +170,13 @@ void    Server::Join(std::string line, int i) {
                     std::vector<Client *>::iterator it;
                     for (it = joinedChannel->_members.begin(); it != joinedChannel->_members.end(); it++)
                     {
-                        std::string message = channelName + " :New user " + _clientList[i]->_username + " has joined the channel.\n";
+                        std::string message = channelName + " :New user with nickname '~" + _clientList[i]->_username + "' has joined the channel.\n";
                         if ((*it)->_clientFd != _clientList[i]->_clientFd)
                             sendMsg((*it)->_clientFd, message);
                     }
                 }
                 else
-                    sendMsg(_clientList[i]->_clientFd, "you are already joined this channel before\n");
+                    sendMsg(_clientList[i]->_clientFd, "You have already joined this channel before.\n");
             }
             // In case the channel doesn't exists before, create a new one
             else if (joinedChannel == NULL) {

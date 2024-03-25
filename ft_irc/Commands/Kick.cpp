@@ -51,43 +51,45 @@ void    Server::Kick(std::string line, int i)
     int flag, j;
     
     j = 0;
-    if (args == 4)
+    if (args >= 4)
     {
         while (iss && j <= args)
         {
             // KICK <channel> <user> [<reason>]
-            if (j == 1)
-                iss >> cmd;         // Command
-            else if (j == 2)
-                iss >> channel;     // Channel
-            else if (j == 3)
-                iss >> nickname;    // User Nickname
-            else if (j == 4)
-                iss >> reason;     // Reason
+            if (j == 1)             // Command
+                iss >> cmd;
+            else if (j == 2)        // Channel
+                iss >> channel;
+            else if (j == 3)        // User Nickname
+                iss >> nickname;
+            else if (j >= 4)        // Reason
+            {
+                std::string tmp;
+
+                if (reason.empty())
+                    iss >> reason;
+                else
+                {
+                    reason += " ";
+                    iss >> tmp;
+                    reason += tmp;
+                }
+            }
             j++;
         }
-        std::cout << "cmd:\t" << cmd << std::endl;
-        std::cout << "channel:\t" << channel << std::endl;
-        std::cout << "nickname:\t" << nickname << std::endl;
-        std::cout << "reason:\t" << reason << std::endl;
 
         // check if channel exist
         flag = 0;
-        std::vector<Channel *> channels;
-        for (size_t k = 0; k < channels.size(); ++k) {
-            std::cout << "1. channel = " << channel << "=" << std::endl;
-            std::cout << "2. channel = " << channels[k]->_name << "=" << std::endl;
-            if (channels[k]->_name.compare(channel) == 0 || channels[k]->_name == channel)
+        for (size_t k = 0; k < _channels.size(); ++k) {
+            if (_channels[k]->_name.compare(channel) == 0)
             {
                 flag = 1;
-                std::cout << "1. channel = " << channel << "=" << std::endl;
-                std::cout << "2. channel = " << channels[k]->_name << "=" << std::endl;
                 break;
             }
         }
         if (flag == 0)
         {
-            std::string messageToSend = "This channel doesn't exist in the server!\n";
+            std::string messageToSend = "Channel '" + channel + "' doesn't exist in the server!\n";
             sendMsg(_clientList[i]->_clientFd, messageToSend);
             return;
         }
@@ -100,7 +102,7 @@ void    Server::Kick(std::string line, int i)
             return;
         }
 
-        // check if the user nickname exists
+        // check if the user nickname exists (if the user is an admin, then the admin will r)
         int flag = 0;
         Client *client;
         std::vector<Client *>::iterator it;
@@ -109,6 +111,13 @@ void    Server::Kick(std::string line, int i)
             client = *it;
             if (client->_nickname.compare(nickname) == 0 && client->_joinedChannel.compare(channel) == 0)
             {
+                // if true, notify the admin
+                if (client->_userMode.find('o') != std::string::npos)
+                {
+                    std::string msg = "A user with nickname '~" + _clientList[i]->_nickname + "' is trying to kick you from the channel '" + channel + "'\n";
+                    sendMsg(client->_clientFd, msg);
+                }
+                // flag 1 and quit
                 flag = 1;
                 break;
             }
@@ -135,9 +144,9 @@ void    Server::Kick(std::string line, int i)
 
         // message to send
         std::string messageToSend;
-        messageToSend = "User Kicked: ";
-        messageToSend += reason;
-        messageToSend += "\n";
+        messageToSend = "";
+        messageToSend += "[Channel " + channel + "] ' ~" + client->_nickname + "' kicked from the channel by operator '~" + _clientList[i]->_nickname + "'\n";
+        messageToSend +=  "  └─── Reason: '" + reason + "'\n";
         // for loop on clients on channel
         for (std::vector<Client *>::iterator it = _clientList.begin(); it != _clientList.end(); ++it)
         {
@@ -148,13 +157,13 @@ void    Server::Kick(std::string line, int i)
         // send msg to the kicked user and close connection
         messageToSend = "You have been kicked from the channel ";
         messageToSend += "'" + channel + "'";
-        messageToSend += " by [" + _clientList[i]->_nickname + "]\n";
+        messageToSend += " by operator [~" + _clientList[i]->_nickname + "]\n";
         messageToSend += "[Reason]: " + reason + "\n";
         sendMsg(client->_clientFd, messageToSend);
 
         // remove client from channel
-        client->_joined = 0;
-        client->_joinedChannel = "";
+        client->_joined = false;
+        client->_joinedChannel = "\0";
         for (std::vector<Client *>::iterator it = _clientList.begin(); it != _clientList.end(); ++it)
         {
             Client *client = *it;
@@ -162,13 +171,8 @@ void    Server::Kick(std::string line, int i)
                 break;
         }
         removeClientFromChannels(client);
-
-        std::cout << "client kicked is:\t" << client->_nickname << std::endl;
-        // ::
-        // msg boot 'user' kicked from 'channel' by the operator 'nickname' <reason>:['']
-        /*
-        [user] has been kicked from [channel] by the operator [nickname]. Reason: '[reason]'
-        */
+        std::cout << "[CHANNEL] '~" + client->_nickname + "' kicked from channel '" + channel + "' by the operator '~" + _clientList[i]->_nickname + "'\n";
+        std::cout << "    └───── Reason: '" + reason + "'\n";
     }
 }
 
