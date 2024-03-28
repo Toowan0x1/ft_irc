@@ -152,7 +152,7 @@ void	Server::Send(std::string line, int i)
         }
         if (!clientFound)
         {
-            messageToSend = "Error: No user found with the name '" + arg1 + "'!";
+            messageToSend = "Oops! We couldn't find any user with the name '~" + arg1 + "'. Please check the name and try again.\n";
             sendMsg(_clientList[i]->_clientFd, messageToSend);
         }
     }

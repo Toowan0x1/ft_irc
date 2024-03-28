@@ -71,18 +71,18 @@ void    Server::Topic(std::string line, int i)
             {
                 std::string messageToSend;
                 if (channel->_topic.empty())
-                    channel->_topic = "'NULL'";
-                messageToSend = _clientList[i]->_joinedChannel + " TOPIC: " + channel->_topic + "\n";
-                std::cout << messageToSend;
+                    channel->_topic = "*";
+                messageToSend = ":" + _hostname + " TOPIC " + _clientList[i]->_joinedChannel + " : " + channel->_topic + "\n";
                 sendMsg(_clientList[i]->_clientFd, messageToSend);
                 break;
             }
         }
+        return;
     }
-    else if (args == 2)
+    else if (args >= 2)
     {
         std::stringstream iss(line);
-        std::string cmd, topic;
+        std::string cmd, topic, tmp;
         std::string messageToSend;
         int j = 0;
 
@@ -90,39 +90,46 @@ void    Server::Topic(std::string line, int i)
         {
             if (j == 1)
                 iss >> cmd;     // Command
-            else if (j == 2)
-                iss >> topic;   // Topic
+            else if (j >= 2)
+            {
+                if (topic.empty())  // Topic
+                    iss >> topic;
+                else
+                {
+                    iss >> tmp;
+                    topic += " ";
+                    topic += tmp;
+                }
+            }
             j++;
         }
 
         // check op mode
         if (!containsChar(_clientList[i]->_userMode, 'o')) {
-            messageToSend = "You don't have the privileges permits you to change this channel's topic!\n";
+            messageToSend = ":" + _hostname + " TOPIC ERROR " + _clientList[i]->_joinedChannel + " : " + "You're not channel operator\n";
             sendMsg(_clientList[i]->_clientFd, messageToSend);
             return;
         }
-        std::cout << "bypassed\n";
+
         // loop on channels
         std::vector<Channel *>::iterator it;
-        //for (size_t k = 0; k < channels.size(); ++k) {
-        for (it = _channels.begin(); it != _channels.end(); ++it) {
+        for (it = _channels.begin(); it != _channels.end(); ++it)
+        {
             Channel *channel = *it;
             if (channel->_name == _clientList[i]->_joinedChannel)
             {
-                std::cout << channel->_name << "\n";
                 channel->_topic = topic;
                 // server output :
                 std::cout << "[" + channel->_name + "] Topic changed -> " + topic + "\n";
+                messageToSend = ":" + _hostname + " TOPIC CHANGED " + _clientList[i]->_joinedChannel + " : " + topic + "\n";
                 sendMsg(_clientList[i]->_clientFd, messageToSend);
                 // inform channel members
-                size_t l = 0;
-                while (channel->_members[l])
+                for (size_t l = 0; l < channel->_members.size(); l++)
                 {
-                    // :<server> 332 <nick> <channel> :<new_topic>
-                    messageToSend = ":" + this->_hostname + " 332 " + this->_clientList[i]->_nickname + " " + channel->_name + " :" + topic + "\n";
+                    messageToSend = ":" + this->_hostname + " 332 " + this->_clientList[i]->_nickname + " " + channel->_name + " :TOPIC CHANGED: " + topic + "\n";
                     sendMsg(channel->_members[l]->_clientFd, messageToSend);
-                    l++;
                 }
+                break;
             }
         }
     }

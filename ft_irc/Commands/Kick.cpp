@@ -155,10 +155,11 @@ void    Server::Kick(std::string line, int i)
                 sendMsg(user->_clientFd, messageToSend);
         }
         // send msg to the kicked user and close connection
-        messageToSend = "You have been kicked from the channel ";
+        messageToSend = ":" + _hostname + "KICK " + channel + " :";
+        messageToSend += "You have been kicked from the channel ";
         messageToSend += "'" + channel + "'";
         messageToSend += " by operator [~" + _clientList[i]->_nickname + "]\n";
-        messageToSend += "[Reason]: " + reason + "\n";
+        messageToSend += "  └── [Reason]: " + reason + "\n";
         sendMsg(client->_clientFd, messageToSend);
 
         // remove client from channel
@@ -170,10 +171,29 @@ void    Server::Kick(std::string line, int i)
             if (client->_nickname == nickname)
                 break;
         }
+        
+        // remove client from channel
         removeClientFromChannels(client);
+        {
+            for (size_t x = 0; x < _channels.size(); ++x) {
+                if (_channels[x]->_name == channel)
+                {
+                    // Find the client in the channel's list of clients
+                    for (size_t y = 0; y < _channels[x]->_members.size(); ++y)
+                    {
+                        if (_channels[x]->_members[y] == client)
+                        {
+                            // Remove the client from the channel's list of clients
+                            _channels[x]->_members.erase(_channels[x]->_members.begin() + y);
+                            // Optionally notify other clients about the removal
+                            break;
+                        }
+                    }
+                    break; // Stop searching for the channel once the client is found and removed
+                }
+            }
+        }
         std::cout << "[CHANNEL] '~" + client->_nickname + "' kicked from channel '" + channel + "' by the operator '~" + _clientList[i]->_nickname + "'\n";
         std::cout << "    └───── Reason: '" + reason + "'\n";
     }
 }
-
-// kick invite leave quit

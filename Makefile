@@ -34,6 +34,7 @@ SRC :=	ft_irc/main.cpp		\
 		ft_irc/Commands/Privmsg.cpp \
 		ft_irc/Commands/Send.cpp \
 		ft_irc/Commands/Leave.cpp \
+		ft_irc/Commands/Invite.cpp \
 		Bot.cpp \
 		# ft_irc/Commands/Privmsg.cpp \https://github.dev/Toowan0x1/ft_irc/blob/master/Makefile		
 

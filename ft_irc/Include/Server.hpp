@@ -60,7 +60,6 @@ class Server {
         void    Quit(std::string line, int clientFd);
         void    Join(std::string line, int clientFd);
         void    List(std::string line, int clientFd);
-
         void    Kick(std::string line, int clientFd);
         void    Mode(std::string line, int clientFd);
         void    Topic(std::string line, int clientFd);
@@ -70,8 +69,7 @@ class Server {
         void    Privmsg(std::string line, int clientFd);
         void    Send(std::string line, int clientFd);
         void    Leave(std::string line, int clientFd);
-        // void    Privmsg(std::string line, int clientFd);
-        // void    Invite(std::string line, int clientFd);
+        void    Invite(std::string line, int clientFd);
         
         void    removeClientFromChannels(Client *client);
         bool    startsWith(const std::string&, const std::string&);

@@ -34,7 +34,6 @@ static void    sendMsg(int fd, std::string msg)
 }
 
 void    Server::Who(std::string line, int i) {
-    //(void)i;
     i = i;
     int args = countArguments(line);
     if (args > 1) {

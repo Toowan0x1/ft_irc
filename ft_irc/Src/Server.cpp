@@ -250,8 +250,8 @@ void    Server::parse_cmd(std::string line, int i) {
         Quit(line, i);
     else if (startsWith(line, "list") || startsWith(line, "LIST"))
         List(line, i);
-    // else if (startsWith(line, "invite") || startsWith(line, "Invite"))
-    //     Invite(line, i);
+    else if (startsWith(line, "invite") || startsWith(line, "Invite"))
+        Invite(line, i);
     else if (startsWith(line, "kick") || startsWith(line, "Kick"))
         Kick(line, i);
     else if (startsWith(line, "mode") || startsWith(line, "Mode"))
