@@ -90,7 +90,7 @@ void    Server::Invite(std::string line, int i)
         }
 
         // 3. invite 
-        std::string successMsg = "SUCCESS: User '~"+ client->_nickname + "' invited to join channel space '" + channelName + "'.";
+        std::string successMsg = ":" + _hostname + " SUCCESS: User '~"+ client->_nickname + "' invited to join channel space '" + channelName + "'.";
         sendMsg(_clientList[i]->_clientFd, successMsg + "\n");
         std::string inviteMsg = "INVITE: '~" + _clientList[i]->_nickname + "' invited you to join channel '" + channelName + "' chat room.";
         sendMsg(client->_clientFd, inviteMsg + "\n");

@@ -49,7 +49,7 @@ void    Server::Kick(std::string line, int i)
     std::stringstream iss(line);
     std::string cmd, channel, nickname, reason;
     int flag, j;
-    
+    std::cout << line << std::endl;
     j = 0;
     if (args >= 4)
     {
@@ -114,8 +114,10 @@ void    Server::Kick(std::string line, int i)
                 // if true, notify the admin
                 if (client->_userMode.find('o') != std::string::npos)
                 {
-                    std::string msg = "A user with nickname '~" + _clientList[i]->_nickname + "' is trying to kick you from the channel '" + channel + "'\n";
-                    sendMsg(client->_clientFd, msg);
+                    std::string messageToSend;
+                    messageToSend = ":" + _hostname + " KICK " + channel + " :";;
+                    messageToSend += "A user with nickname '~" + _clientList[i]->_nickname + "' is trying to kick you from the channel '" + channel + "'\n";
+                    sendMsg(client->_clientFd, messageToSend);
                 }
                 // flag 1 and quit
                 flag = 1;
@@ -123,28 +125,31 @@ void    Server::Kick(std::string line, int i)
             }
         }
         if (flag == 0) {
-            std::string messageToSend = "This nickname doesn't exist in the channel!\n";
+            std::string messageToSend = ":" + _hostname + " KICK " + channel + " :";
+            messageToSend += "This nickname doesn't exist in the channel!\n";
             sendMsg(_clientList[i]->_clientFd, messageToSend);
             return;
         }
 
         // check auths
         if (!_clientList[i]->_authenticated) {
-            std::string messageToSend = "Not authenticated yet! Use '/PASS <Password>' to authenticate to the server.\n";
+            std::string messageToSend = ":" + _hostname + " KICK " + channel + " :";
+            messageToSend += "Not authenticated yet! Use '/PASS <Password>' to authenticate to the server.\n";
             sendMsg(_clientList[i]->_clientFd, messageToSend);
             return;
         }
 
         // check op mode
         if (!containsChar(_clientList[i]->_userMode, 'o')) {
-            std::string messageToSend = "You haven't enough permissions to kick users on this channel '" + channel + "' !\n";
+            std::string messageToSend = ":" + _hostname + " KICK :";
+            messageToSend += "You haven't enough permissions to kick users on this channel '" + channel + "' !\n";
             sendMsg(_clientList[i]->_clientFd, messageToSend);
             return;
         }
 
         // message to send
         std::string messageToSend;
-        messageToSend = "";
+        messageToSend = ":" + _hostname + " KICK " + channel + " :";
         messageToSend += "[Channel " + channel + "] ' ~" + client->_nickname + "' kicked from the channel by operator '~" + _clientList[i]->_nickname + "'\n";
         messageToSend +=  "  └─── Reason: '" + reason + "'\n";
         // for loop on clients on channel
@@ -155,7 +160,7 @@ void    Server::Kick(std::string line, int i)
                 sendMsg(user->_clientFd, messageToSend);
         }
         // send msg to the kicked user and close connection
-        messageToSend = ":" + _hostname + "KICK " + channel + " :";
+        messageToSend = ":" + _hostname + " KICK " + channel + " :";
         messageToSend += "You have been kicked from the channel ";
         messageToSend += "'" + channel + "'";
         messageToSend += " by operator [~" + _clientList[i]->_nickname + "]\n";

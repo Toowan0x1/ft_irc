@@ -40,6 +40,7 @@ void    Server::Privmsg(std::string line, int i)
     std::string cmd, arg1, msg;
     std::string messageToSend;
     int j = 0;
+
     while (iss && j <= args) {
         std::string word;
         iss >> word;
@@ -70,7 +71,7 @@ void    Server::Privmsg(std::string line, int i)
                 size_t l = 0;
                 while (l < channel->_members.size())
                 {
-                    messageToSend = ":" + _clientList[i]->_nickname + " MSG " + channel->_name + " :" + msg + "\n";
+                    messageToSend = ":" + _clientList[i]->_nickname + " PRVMSG " + channel->_name + " :" + msg + "\n";
                     //std::cout << channel->_members[l]->_nickname << "\n";
                     sendMsg(channel->_members[l]->_clientFd, messageToSend);
                     l++;
@@ -95,7 +96,7 @@ void    Server::Privmsg(std::string line, int i)
             Client *client = *it;
             if (client->_nickname == arg1) {
                 clientFound = true;
-                messageToSend = ":" + _clientList[i]->_nickname + " MSG " + client->_nickname + " :" + msg + "\n";
+                messageToSend = ":" + _clientList[i]->_nickname + " PRIVMSG " + client->_nickname + " :" + msg + "\n";
                 sendMsg(client->_clientFd, messageToSend);
                 break;
             }

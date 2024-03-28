@@ -200,14 +200,15 @@ void    Server::Join(std::string line, int i) {
                 */
                _clientList[i]->_userMode = "o";
                 
-                std::string tmp = _hostname + " 001 " + _clientList[i]->_nickname + " :Welcome to the channel! Enjoy your stay.\n";
+                std::string tmp = ":" + _hostname + " 001 " + _clientList[i]->_nickname + " :Welcome to the channel! Enjoy your stay.\n";
                 sendMsg(_clientList[i]->_clientFd, tmp);
                 
                 /* inform channel members that a new user joined */
                 std::vector<Client *>::iterator it;
                 for (it = newChannel->_members.begin(); it != newChannel->_members.end(); it++)
                 {
-                    std::string message = channelName + " :New user '~" + _clientList[i]->_username + "' has joined the channel.\n";
+                    std::string message = ":" + _hostname + " JOIN " + channelName + " :New user '~";
+                    message  += channelName + _clientList[i]->_username + "' has joined the channel.\n";
                     if ((*it)->_clientFd != _clientList[i]->_clientFd)
                         sendMsg((*it)->_clientFd, message);
                 }
@@ -216,7 +217,8 @@ void    Server::Join(std::string line, int i) {
     }
     else
     {
-        std::string message = "461 " + _clientList[i]->_nickname + " JOIN :Not enough parameters.\n";
+        std::string message = ":" + _hostname;
+        message += " 461 " + _clientList[i]->_nickname + " JOIN :Not enough parameters.\n";
         sendMsg(_clientList[i]->_clientFd, message);
     }
 }

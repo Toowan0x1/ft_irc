@@ -49,7 +49,7 @@ void    Server::Pass(std::string line, int i)
             if (_clientList[i]->_username.empty())
                messageToSend = ":" + this->_hostname + " Welcome to the IRC Network\n";
             else
-                messageToSend = ":" + this->_hostname + " 001 " + this->_clientList[i]->_username + " :Welcome to the IRC Network, " + this->_clientList[i]->_username + "!\n";
+                messageToSend = ":" + this->_hostname + " 001 " + this->_clientList[i]->_nickname + " :Welcome to the IRC Network, " + this->_clientList[i]->_nickname + "!\n";
             sendMsg(_clientList[i]->_clientFd, messageToSend);
         }
         else

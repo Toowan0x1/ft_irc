@@ -225,8 +225,3 @@ void    Server::Mode(std::string line, int i)
         }
     }
 }
-/*
-MODE nickname +i    // Set invisible mode
-MODE nickname -a    // Unset away mode
-MODE nickname       // Query user modes
-*/

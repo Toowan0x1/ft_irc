@@ -33,10 +33,11 @@ static void    sendMsg(int fd, std::string msg)
     }
 }
 
-void    Server::Who(std::string line, int i) {
-    i = i;
+void    Server::Who(std::string line, int i)
+{
     int args = countArguments(line);
-    if (args > 1) {
+    if (args > 1)
+    {
         std::stringstream iss(line);
         std::string cmd, channel;
 
