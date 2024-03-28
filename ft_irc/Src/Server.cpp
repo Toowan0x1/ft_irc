@@ -28,8 +28,12 @@
 //     // notify other clients about the removal
 // }
 
-void Server::removeClientFromChannels(Client *client) {
-    for (size_t i = 0; i < _channels.size(); ++i) {
+void Server::removeClientFromChannels(Client *client)
+{
+    for (size_t i = 0; i < _channels.size(); ++i)
+    //size_t i = 0;
+    //while (i < _channels.size())
+    {
         if (_channels[i]->_name == client->_joinedChannel) {
             // Find the client in the channel's list of clients
             for (size_t j = 0; j < _channels[i]->_members.size(); ++j) {
@@ -42,6 +46,7 @@ void Server::removeClientFromChannels(Client *client) {
             }
             break; // Stop searching for the channel once the client is found and removed
         }
+        //i++;
     }
 }
 

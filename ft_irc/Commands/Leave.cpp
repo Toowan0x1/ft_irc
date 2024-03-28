@@ -33,16 +33,63 @@ static void    sendMsg(int fd, std::string msg)
     }
 }
 
+// leave <channelName> <leaveMsg>
+
 void    Server::Leave(std::string line, int i)
 {
     int args = countArguments(line);
-    (void)i;
-    (void)sendMsg;
-    if (args == 1) {
-        /**/
+    std::string cmd, channelName, leaveMsg;
+    std::stringstream iss(line);
+    
+    int k = 0;
+    while (iss && k <= args) {
+        std::string word;
+        iss >> word;
+        if (k == 0)
+            cmd = word;
+        else if (k == 1)
+            channelName = word;
+        else if (k >= 2)
+        {
+            if (!leaveMsg.empty())
+                leaveMsg += " ";
+            leaveMsg += word;
+        }
+        k++;
     }
+
+    // get channel first
+    Channel *channel;
+    for (std::vector<Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+    {
+        channel = *it;
+        if (channel->_name == channelName)
+            break;
+    }
+
     // check joined 
+    if (_clientList[i]->_joined == 1 && _clientList[i]->_joinedChannel.empty() == false) {
+        _clientList[i]->_joined = 0;
+        _clientList[i]->_joinedChannel = "";
+    } else {
+        sendMsg(_clientList[i]->_clientFd, "Sorry, you are not currently in any channels to leave.\n");
+    }
+    
     // leave channel
+    removeClientFromChannels(_clientList[i]);
+
     // anounce message to all channel members
+    for (size_t j = 0; j < channel->_members.size(); ++j)
+    {
+        if (channel->_members[j]->_nickname != _clientList[i]->_nickname)
+        {
+            std::string msg1 = "~" + _clientList[i]->_nickname + " has left the chat.\n";
+            sendMsg(channel->_members[j]->_clientFd, msg1);
+            std::string msg2 = ":" + _clientList[i]->_nickname + "!" + _clientList[i]->_nickname + "@" + _hostname + " LEAVE :" + leaveMsg + "\n";
+            sendMsg(channel->_members[j]->_clientFd, msg2);
+        }
+    }
+
     // anounce message to user after leaving
+    sendMsg(_clientList[i]->_clientFd, "You have successfully left the chat room " + channelName + ".\n");
 }

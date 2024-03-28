@@ -149,9 +149,8 @@ void    Server::Kick(std::string line, int i)
 
         // message to send
         std::string messageToSend;
-        messageToSend = ":" + _hostname + " KICK " + channel + " :";
+        //messageToSend = ":" + _hostname + " KICK " + channel + " :";
         messageToSend += "[Channel " + channel + "] ' ~" + client->_nickname + "' kicked from the channel by operator '~" + _clientList[i]->_nickname + "'\n";
-        messageToSend +=  "  └─── Reason: '" + reason + "'\n";
         // for loop on clients on channel
         for (std::vector<Client *>::iterator it = _clientList.begin(); it != _clientList.end(); ++it)
         {
@@ -159,8 +158,8 @@ void    Server::Kick(std::string line, int i)
             if (user->_joinedChannel.compare(channel) == 0 && user->_nickname.compare(nickname))
                 sendMsg(user->_clientFd, messageToSend);
         }
-        // send msg to the kicked user and close connection
-        messageToSend = ":" + _hostname + " KICK " + channel + " :";
+        // send msg to the kicked user
+        //messageToSend = ":" + _hostname + " KICK " + channel + " :";
         messageToSend += "You have been kicked from the channel ";
         messageToSend += "'" + channel + "'";
         messageToSend += " by operator [~" + _clientList[i]->_nickname + "]\n";
